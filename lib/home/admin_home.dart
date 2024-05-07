@@ -77,6 +77,12 @@ class _AdminHomeState extends State<AdminHome> {
                         child: NavigationRail(
                           backgroundColor: Colors.black,
                           selectedIndex: _selectedIndex,
+                          unselectedLabelTextStyle:
+                              const TextStyle(color: Colors.grey, fontSize: 13),
+                          selectedLabelTextStyle:
+                              const TextStyle(color: Colors.white),
+                          unselectedIconTheme:
+                              const IconThemeData(color: Colors.white),
                           onDestinationSelected: (int index) {
                             setState(() {
                               _selectedIndex = index;
@@ -89,36 +95,36 @@ class _AdminHomeState extends State<AdminHome> {
                               label: Text('Home'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.shopping_cart),
-                              label: Text('Total Sales'),
+                              icon: Icon(Icons.headset_mic),
+                              label: Text('Live Chat'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.access_time),
-                              label: Text('Pending Orders'),
+                              icon: Icon(Icons.newspaper),
+                              label: Text('Gona News'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.done_all),
-                              label: Text('Processed Orders'),
+                              icon: Icon(Icons.category),
+                              label: Text('Manage Categories'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.local_shipping),
-                              label: Text('Shipped Orders'),
+                              icon: Icon(Icons.attach_money),
+                              label: Text('Manage Loans'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.delivery_dining),
-                              label: Text('Delivered Orders'),
+                              icon: Icon(Icons.mail),
+                              label: Text('Gona Mails'),
                             ),
                             NavigationRailDestination(
                               icon: Icon(Icons.people),
-                              label: Text('Vendors'),
+                              label: Text('Our Vendors'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.person_add),
-                              label: Text('New Users'),
+                              icon: Icon(Icons.person),
+                              label: Text('Users'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.bar_chart),
-                              label: Text('Sales Overview'),
+                              icon: Icon(Icons.adjust),
+                              label: Text('Manage Disputes'),
                             ),
                           ],
                         ),
