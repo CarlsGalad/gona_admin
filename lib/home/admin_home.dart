@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:gona_admin/home/home_screen.dart';
 
-import '../gonanews.dart';
+import '../news/gonanews.dart';
 import '../live_chat.dart';
 
 class AdminHome extends StatefulWidget {
