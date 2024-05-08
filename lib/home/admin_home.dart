@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:gona_admin/home/delivered_orders.dart';
-import 'package:gona_admin/home/new_users_tile.dart';
-import 'package:gona_admin/home/pending_orders.dart';
-import 'package:gona_admin/home/proccessed_order.dart';
-import 'package:gona_admin/home/sales_overview.dart';
-import 'package:gona_admin/home/shipped_orders.dart';
-import 'package:gona_admin/home/total_sales.dart';
-import 'package:gona_admin/home/vendors_tile.dart';
+import 'package:gona_admin/home/home_screen.dart';
 
-import '../welcomemsg.dart';
+import '../gonanews.dart';
+import '../live_chat.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -23,6 +17,23 @@ class _AdminHomeState extends State<AdminHome> {
 
   @override
   Widget build(BuildContext context) {
+    Widget screen;
+
+    switch (_selectedIndex) {
+      case 0:
+        screen = const HomeScreen();
+        break;
+      case 1:
+        screen = const ChatPlaceholderWidget();
+        break;
+      case 2:
+        screen = const NewsScreen();
+        break;
+      default:
+        screen = Container(); // Add default case or handle error
+        break;
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -137,68 +148,11 @@ class _AdminHomeState extends State<AdminHome> {
                   width: 1,
                   color: Color.fromARGB(255, 26, 25, 25),
                 ),
-                // This is the main content.
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Container(
-                      color: Colors.black54,
-                      child: Column(
-                        children: [
-                          const WelcomeBackWidget(),
-                          Container(
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 26, 25, 25),
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(15))),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  //first row
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              TotalSalesTile(),
-                                              PendingOrderTile(),
-                                            ],
-                                          ),
-                                          //Second Row
-                                          Row(
-                                            children: [
-                                              ProcessedCountTile(),
-                                              ShippedOdersCount(),
-                                              DeliveredCountTitle(),
-                                            ],
-                                          ),
-
-                                          // Third Row
-                                          Row(
-                                            children: [
-                                              VendorCountTile(),
-                                              NewUsersCountTile(),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      SalesOverviewTile(),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                // // This is the main content.  if (_selectedIndex ==
+                //               1) // Check if Live Chat is selected
+                //             const ChatPlaceholderWidget(), // Render ChatPlaceholderWidget
+                //           if (_selectedIndex !=1)
+                screen,
               ],
             ),
           ),

@@ -16,17 +16,15 @@ class _DeliveredCountTitleState extends State<DeliveredCountTitle> {
         width: 120,
         height: 140,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(begin: Alignment.bottomLeft, colors: [
-            Colors.blueGrey,
-            Colors.deepPurple,
-            Colors.deepPurpleAccent,
-            Colors.deepPurple,
-          ], stops: [
-            0.1,
-            0.3,
-            0.9,
-            1.0
-          ]),
+          gradient: const LinearGradient(
+            begin: Alignment.topRight,
+            colors: [
+              Colors.blueGrey,
+              Colors.deepPurple,
+              Colors.deepPurpleAccent,
+              Colors.deepPurple,
+            ],
+          ),
           borderRadius: BorderRadius.circular(20),
         ),
         child: const Padding(

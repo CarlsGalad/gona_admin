@@ -17,7 +17,7 @@ class _VendorCountTileState extends State<VendorCountTile> {
         height: 120,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            begin: Alignment.bottomLeft,
+            begin: Alignment.topLeft,
             colors: [
               Colors.blueGrey,
               Colors.deepPurple,
