@@ -14,6 +14,10 @@ class NewsDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 40.0, top: 50),
+            child: Text(newsItem.title),
+          ),
           Image.network(
             newsItem.imageUrl,
             height: 200,

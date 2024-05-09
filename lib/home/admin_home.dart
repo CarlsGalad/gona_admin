@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:gona_admin/home/home_screen.dart';
 
+import '../category.dart';
+import '../disputes/disputes.dart';
+import '../mails/gonamails.dart';
 import '../news/gonanews.dart';
 import '../live_chat.dart';
+import '../user/users.dart';
+import '../vendors/vendors.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -28,6 +33,21 @@ class _AdminHomeState extends State<AdminHome> {
         break;
       case 2:
         screen = const NewsScreen();
+        break;
+      case 3:
+        screen = const ManageCategoryScreen();
+        break;
+      case 5:
+        screen = const GonaMailsScreen();
+        break;
+      case 6:
+        screen = const OurVendorsScreen();
+        break;
+      case 7:
+        screen = const OurUsersScreen();
+        break;
+      case 8:
+        screen = const ManageDisputesScreen();
         break;
       default:
         screen = Container(); // Add default case or handle error

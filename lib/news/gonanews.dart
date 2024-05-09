@@ -20,7 +20,7 @@ class NewsScreenState extends State<NewsScreen> {
       padding: const EdgeInsets.all(10.0),
       child: Container(
         width: MediaQuery.of(context).size.width -
-            180, // Ensure the container takes the full available width
+            160, // Ensure the container takes the full available width
         child: Row(
           children: [
             Expanded(
@@ -28,20 +28,32 @@ class NewsScreenState extends State<NewsScreen> {
                 itemCount: mockNews.length,
                 itemBuilder: (context, index) {
                   final newsItem = mockNews[index];
-                  return ListTile(
-                    onTap: () {
-                      // When a news item is tapped, update the current screen to NewsDetailScreen
-                      setState(() {
-                        _currentScreen = NewsDetailScreen(newsItem: newsItem);
-                      });
-                    },
-                    leading: Image.network(newsItem.imageUrl),
-                    title: Text(newsItem.title),
-                    subtitle:
-                        Text('By ${newsItem.author} • ${newsItem.timePosted}'),
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: const BoxDecoration(color: Colors.blueGrey),
+                      child: ListTile(
+                        onTap: () {
+                          // When a news item is tapped, update the current screen to NewsDetailScreen
+                          setState(() {
+                            _currentScreen =
+                                NewsDetailScreen(newsItem: newsItem);
+                          });
+                        },
+                        leading: Image.network(newsItem.imageUrl),
+                        title: Text(newsItem.title),
+                        subtitle: Text(
+                            'By ${newsItem.author} • ${newsItem.timePosted}'),
+                      ),
+                    ),
                   );
                 },
               ),
+            ),
+            const VerticalDivider(
+              thickness: 1,
+              width: 2,
+              color: Colors.grey,
             ),
             Expanded(
               flex: 2,
