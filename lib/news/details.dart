@@ -12,6 +12,7 @@ class NewsDetailScreen extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -20,8 +21,8 @@ class NewsDetailScreen extends StatelessWidget {
           ),
           Image.network(
             newsItem.imageUrl,
-            height: 200,
-            width: double.infinity,
+            height: 300,
+            width: 500,
             fit: BoxFit.cover,
           ),
           const SizedBox(height: 16.0),

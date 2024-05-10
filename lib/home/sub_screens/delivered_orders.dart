@@ -13,10 +13,33 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white54,
+        appBar: AppBar(
+          title: const Text(
+            'Delivered Orders',
+            style: TextStyle(color: Colors.white),
+          ),
+          toolbarHeight: 50,
+          backgroundColor: Colors.black,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 30.0),
+              child: AnimatedContainer(
+                duration: const Duration(
+                  milliseconds: 500,
+                ),
+                child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.search),
+                ),
+              ),
+            )
+          ],
+        ),
         body: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
-              width: MediaQuery.of(context).size.width - 180,
+              width: MediaQuery.of(context).size.width - 160,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.blueGrey),
@@ -26,11 +49,27 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
                     flex: 2,
                     child: _buildOrdersListView(),
                   ),
+                  const VerticalDivider(
+                    width: 1,
+                    color: Colors.white54,
+                  ),
                   Expanded(
                     flex: 3,
                     child: _selectedOrderIndex == null
-                        ? const Center(
-                            child: Text('Please select an order'),
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white54,
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text('Please select an order'),
+                                ),
+                              ),
+                            ),
                           )
                         : _buildOrderDetailsView(),
                   ),
@@ -43,13 +82,20 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
     return ListView.builder(
       itemCount: 10, // Number of delivered orders
       itemBuilder: (context, index) {
-        return ListTile(
-          title: Text('Order ${index + 1}'),
-          onTap: () {
-            setState(() {
-              _selectedOrderIndex = index;
-            });
-          },
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            height: 70,
+            color: Colors.white54,
+            child: ListTile(
+              title: Text('Order ${index + 1}'),
+              onTap: () {
+                setState(() {
+                  _selectedOrderIndex = index;
+                });
+              },
+            ),
+          ),
         );
       },
     );
