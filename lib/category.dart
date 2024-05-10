@@ -13,6 +13,7 @@ class _ManageCategoryScreenState extends State<ManageCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.black,
       width: MediaQuery.of(context).size.width - 180,
       child: Row(
         children: [

@@ -8,6 +8,10 @@ import 'pending_orders.dart';
 import 'proccessed_order.dart';
 import 'sales_overview.dart';
 import 'shipped_orders.dart';
+import 'sub_screens/delivered_orders.dart';
+import 'sub_screens/pendening_orders.dart';
+import 'sub_screens/processed_orders.dart';
+import 'sub_screens/shipped_orders.dart';
 import 'top_locations.dart';
 import 'topitems.dart';
 import 'total_sales.dart';
@@ -47,31 +51,63 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Column(
+                          Column(
                             children: [
                               Row(
                                 children: [
-                                  TotalSalesTile(),
-                                  PendingOrderTile(),
+                                  const TotalSalesTile(),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const PendingOrderScreen()));
+                                      },
+                                      child: const PendingOrderTile()),
                                 ],
                               ),
                               //Second Row
                               Row(
                                 children: [
-                                  ProcessedCountTile(),
-                                  ShippedOdersCount(),
-                                  DeliveredCountTitle(),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ProcessedOrderScreen()));
+                                      },
+                                      child: const ProcessedCountTile()),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ShippedOrderScreen()));
+                                      },
+                                      child: const ShippedOdersCount()),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const DeliveredOrderScreen()));
+                                      },
+                                      child: const DeliveredCountTitle()),
                                 ],
                               ),
 
                               // Third Row
-                              Row(
+                              const Row(
                                 children: [
                                   VendorCountTile(),
                                   NewUsersCountTile(),
                                 ],
                               ),
-                              PieChartWidget(),
+                              const PieChartWidget(),
                             ],
                           ),
                           Column(
