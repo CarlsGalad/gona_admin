@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:gona_admin/home/sub_screens/delivered_orders.dart';
+import 'package:gona_admin/home/sub_screens/shipped_orders.dart';
 
-import '../welcomemsg.dart';
-import 'daily_chart.dart';
-import 'delivered_orders.dart';
-import 'new_users_tile.dart';
-import 'pending_orders.dart';
-import 'proccessed_order.dart';
-import 'sales_overview.dart';
-import 'shipped_orders.dart';
-import 'sub_screens/delivered_orders.dart';
+// import '../welcomemsg.dart';
+// import 'daily_chart.dart';
+// import 'delivered_orders.dart';
+// import 'new_users_tile.dart';
+// import 'pending_orders.dart';
+// import 'proccessed_order.dart';
+// import 'sales_overview.dart';
+// import 'shipped_orders.dart';
+// import 'sub_screens/delivered_orders.dart';
+import 'main_home.dart';
 import 'sub_screens/pendening_orders.dart';
 import 'sub_screens/processed_orders.dart';
-import 'sub_screens/shipped_orders.dart';
-import 'top_locations.dart';
-import 'topitems.dart';
-import 'total_sales.dart';
-import 'vendors_tile.dart';
+// import 'sub_screens/shipped_orders.dart';
+// import 'top_locations.dart';
+// import 'topitems.dart';
+// import 'total_sales.dart';
+// import 'vendors_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,122 +28,63 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0; // Track selected bottom navigation bar item
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _screens = [
+      const MainHome(), // Your main content screen
+      const PendingOrderScreen(),
+      const ProcessedOrderScreen(),
+      const ShippedOrderScreen(),
+      const DeliveredOrderScreen(),
+    ];
     return Expanded(
-      child: SingleChildScrollView(
-        child: Container(
-          color: Colors.black54,
-          child: Column(
-            children: [
-              const WelcomeBackWidget(),
-
-              // Render other content if not Live Chat
-              Container(
-                decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 26, 25, 25),
-                    borderRadius:
-                        BorderRadius.only(topRight: Radius.circular(15))),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //first row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const TotalSalesTile(),
-                                  GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const PendingOrderScreen()));
-                                      },
-                                      child: const PendingOrderTile()),
-                                ],
-                              ),
-                              //Second Row
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const ProcessedOrderScreen()));
-                                      },
-                                      child: const ProcessedCountTile()),
-                                  GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const ShippedOrderScreen()));
-                                      },
-                                      child: const ShippedOdersCount()),
-                                  GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const DeliveredOrderScreen()));
-                                      },
-                                      child: const DeliveredCountTitle()),
-                                ],
-                              ),
-
-                              // Third Row
-                              const Row(
-                                children: [
-                                  VendorCountTile(),
-                                  NewUsersCountTile(),
-                                ],
-                              ),
-                              const PieChartWidget(),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              const SalesOverviewTile(),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 10.0, right: 10),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Performance Chart',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const DailyChart(),
-                            ],
-                          ),
-                          // Top Items
-                          const TopItems(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: Theme(
+          data: Theme.of(context).copyWith(
+              // sets the background color of the `BottomNavigationBar`
+              canvasColor: Colors.black,
+              // sets the active color of the `BottomNavigationBar` if `Brightness` is light
+              primaryColor: Colors.black,
+              textTheme: Theme.of(context).textTheme.copyWith()),
+          child: BottomNavigationBar(
+            unselectedItemColor: Colors.blueAccent,
+            showSelectedLabels: true,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
               ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.access_time),
+                label: 'Pending Orders',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.done_all),
+                label: 'Processed Orders',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.local_shipping_outlined),
+                label: 'Shipped Orders',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.delivery_dining),
+                label: 'Delivered Orders',
+              ),
+              // ... other items for sub-screens
             ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.blue,
+            onTap: _onItemTapped,
           ),
         ),
       ),

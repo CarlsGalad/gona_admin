@@ -13,39 +13,51 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      body: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: _buildOrdersListView(),
-          ),
-          Expanded(
-            flex: 3,
-            child: _selectedOrderIndex == null
-                ? const Center(
-                    child: Text('Please select an order'),
-                  )
-                : _buildOrderDetailsView(),
-          ),
-        ],
-      ),
+      body: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width - 160,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.blueGrey,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: _buildOrdersListView(),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: _selectedOrderIndex == null
+                      ? const Center(
+                          child: Text('Please select an order'),
+                        )
+                      : _buildOrderDetailsView(),
+                ),
+              ],
+            ),
+          )),
     );
   }
 
   Widget _buildOrdersListView() {
-    return ListView.builder(
-      itemCount: 10, // Number of pending orders
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text('Order ${index + 1}'),
-          onTap: () {
-            setState(() {
-              _selectedOrderIndex = index;
-            });
-          },
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: ListView.builder(
+        itemCount: 10, // Number of pending orders
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text('Order ${index + 1}'),
+            onTap: () {
+              setState(() {
+                _selectedOrderIndex = index;
+              });
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -76,5 +88,3 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
     );
   }
 }
-
-
