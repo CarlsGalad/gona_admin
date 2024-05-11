@@ -1,24 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gona_admin/home/sub_screens/delivered_orders.dart';
 import 'package:gona_admin/home/sub_screens/shipped_orders.dart';
-
-// import '../welcomemsg.dart';
-// import 'daily_chart.dart';
-// import 'delivered_orders.dart';
-// import 'new_users_tile.dart';
-// import 'pending_orders.dart';
-// import 'proccessed_order.dart';
-// import 'sales_overview.dart';
-// import 'shipped_orders.dart';
-// import 'sub_screens/delivered_orders.dart';
 import 'main_home.dart';
 import 'sub_screens/pendening_orders.dart';
 import 'sub_screens/processed_orders.dart';
-// import 'sub_screens/shipped_orders.dart';
-// import 'top_locations.dart';
-// import 'topitems.dart';
-// import 'total_sales.dart';
-// import 'vendors_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
