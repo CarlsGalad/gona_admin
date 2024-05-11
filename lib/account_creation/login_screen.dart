@@ -44,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pop(context);
       //if wrong email
       if (e.code == 'user=not-found') {
+        print('user=not-found${e.code}');
         showDialog(
             context: context,
             builder: (context) {

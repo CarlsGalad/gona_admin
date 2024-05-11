@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ProcessedCountTile extends StatefulWidget {
@@ -8,6 +9,25 @@ class ProcessedCountTile extends StatefulWidget {
 }
 
 class _ProcessedCountTileState extends State<ProcessedCountTile> {
+  int _ProcessedOrdersCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProcessedOrdersCount();
+  }
+
+  Future<void> _fetchProcessedOrdersCount() async {
+    final QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await FirebaseFirestore.instance
+            .collection('orders')
+            .where('orderStatus.processed', isEqualTo: true)
+            .get();
+    setState(() {
+      _ProcessedOrdersCount = querySnapshot.size;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -29,13 +49,13 @@ class _ProcessedCountTileState extends State<ProcessedCountTile> {
           ]),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Padding(
-          padding: EdgeInsets.only(left: 15),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.only(top: 10.0, right: 10),
                 child: Icon(
                   Icons.done_all,
@@ -44,10 +64,10 @@ class _ProcessedCountTileState extends State<ProcessedCountTile> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 1.0, right: 10),
+                padding: const EdgeInsets.only(top: 1.0, right: 10),
                 child: Text(
-                  '700', // Display the count orders with status as process order
-                  style: TextStyle(
+                  '$_ProcessedOrdersCount', // Display the count orders with status as process order
+                  style: const TextStyle(
                       fontSize: 30,
                       color: Colors.white,
                       fontWeight: FontWeight.bold),
@@ -55,8 +75,8 @@ class _ProcessedCountTileState extends State<ProcessedCountTile> {
                   softWrap: false,
                 ),
               ),
-              Spacer(),
-              Padding(
+              const Spacer(),
+              const Padding(
                 padding: EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'Processed Orders',

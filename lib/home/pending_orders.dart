@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class PendingOrderTile extends StatefulWidget {
@@ -8,6 +9,25 @@ class PendingOrderTile extends StatefulWidget {
 }
 
 class _PendingOrderTileState extends State<PendingOrderTile> {
+  int _pendingOrdersCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPendingOrdersCount();
+  }
+
+  Future<void> _fetchPendingOrdersCount() async {
+    final QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await FirebaseFirestore.instance
+            .collection('orders')
+            .where('orderStatus.placed', isEqualTo: true)
+            .get();
+    setState(() {
+      _pendingOrdersCount = querySnapshot.size;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -29,13 +49,13 @@ class _PendingOrderTileState extends State<PendingOrderTile> {
           ]),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Padding(
-          padding: EdgeInsets.only(left: 15),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.only(top: 10.0, right: 10),
                 child: Icon(
                   Icons.access_time,
@@ -44,10 +64,10 @@ class _PendingOrderTileState extends State<PendingOrderTile> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 1.0, right: 10),
+                padding: const EdgeInsets.only(top: 1.0, right: 10),
                 child: Text(
-                  '500', // Display the pending order
-                  style: TextStyle(
+                  '$_pendingOrdersCount', // Display the pending order
+                  style: const TextStyle(
                       fontSize: 30,
                       color: Colors.white,
                       fontWeight: FontWeight.bold),
@@ -55,8 +75,8 @@ class _PendingOrderTileState extends State<PendingOrderTile> {
                   softWrap: false,
                 ),
               ),
-              Spacer(),
-              Padding(
+              const Spacer(),
+              const Padding(
                 padding: EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'Pending Orders',
