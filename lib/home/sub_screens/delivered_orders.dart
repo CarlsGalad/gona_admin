@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class DeliveredOrderScreen extends StatefulWidget {
   const DeliveredOrderScreen({super.key});
@@ -8,7 +11,7 @@ class DeliveredOrderScreen extends StatefulWidget {
 }
 
 class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
-  int? _selectedOrderIndex;
+  DocumentSnapshot? _selectedOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -55,23 +58,7 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
                   ),
                   Expanded(
                     flex: 3,
-                    child: _selectedOrderIndex == null
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white54,
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('Please select an order'),
-                                ),
-                              ),
-                            ),
-                          )
-                        : _buildOrderDetailsView(),
+                    child: _buildOrderDetailsView(_selectedOrder),
                   ),
                 ],
               ),
@@ -79,29 +66,86 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
   }
 
   Widget _buildOrdersListView() {
-    return ListView.builder(
-      itemCount: 10, // Number of delivered orders
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            height: 70,
-            color: Colors.white54,
-            child: ListTile(
-              title: Text('Order ${index + 1}'),
-              onTap: () {
-                setState(() {
-                  _selectedOrderIndex = index;
-                });
-              },
-            ),
-          ),
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final orders = snapshot.data!.docs
+                .where((doc) =>
+                    doc['orderStatus']['placed'] == true &&
+                    doc['orderStatus']['processed'] == true &&
+                    doc['orderStatus']['shipped'] == true &&
+                    doc['orderStatus']['delivered'] == false)
+                .toList();
+
+            if (orders.isEmpty) {
+              return const Center(
+                child: Text('There are no delivered orders.'),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: ListView.builder(
+                itemCount: orders.length, // Number of delivered orders
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+                  final datePlaced =
+                      (order['precessed_date'] as Timestamp).toDate();
+                  final timeAgo =
+                      timeago.format(datePlaced, allowFromNow: true);
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height: 70,
+                      color: Colors.white54,
+                      child: ListTile(
+                        title: Text('Order ${order.id}'),
+                        trailing: Text('Delivered: $timeAgo'),
+                        onTap: () {
+                          setState(() {
+                            _selectedOrder = order;
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }),
     );
   }
 
-  Widget _buildOrderDetailsView() {
+  Widget _buildOrderDetailsView(DocumentSnapshot? order) {
+    if (order == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white54,
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('Please select an order'),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final orderStatus = order['orderStatus'] as Map<String, dynamic>;
+    final shippingInfo = order['shipping_info'] as Map<String, dynamic>;
+    final orderItems = order['orderItems'] as List<dynamic>;
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -109,7 +153,7 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Order ${_selectedOrderIndex! + 1}',
+              'Order ${order.id}',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -118,11 +162,48 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            const Text(
-              'Details of the delivered order will be shown here.',
-              style: TextStyle(fontSize: 16),
+
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: orderItems.length,
+              itemBuilder: (context, index) {
+                final item = orderItems[index] as Map<String, dynamic>;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Item ${index + 1}: ${item['name']}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text('Price: ${item['price']}'),
+                    Text('Quantity: ${item['quantity']}'),
+                    const Divider(),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            const Text(
+              'Shipping Information:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text('Name: ${shippingInfo['name']}'),
+            Text(
+                'Address: ${shippingInfo['address']}, ${shippingInfo['city']}, ${shippingInfo['state']}'),
+            Text('Contact Number: ${shippingInfo['contactNumber']}'),
+            // Display order status
+            const SizedBox(height: 10),
+            const Text(
+              'Order Status:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text('Placed: ${orderStatus['placed']}'),
+            Text('Precessed: ${orderStatus['processed']}'),
+            Text('Shipping: ${orderStatus['shipped']}'),
+
+            Text('Order Date: ${_formatTimestamp(order['order_date'])}'),
+            Text('Total Amount: ${order['total_amount']}'),
+
             ElevatedButton(
               onPressed: () {
                 // Handle pay vendors action
@@ -133,5 +214,11 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
         ),
       ),
     );
+  }
+
+  String _formatTimestamp(Timestamp timestamp) {
+    final date = timestamp.toDate();
+    final formatter = DateFormat('MMMM d, yyyy');
+    return formatter.format(date);
   }
 }

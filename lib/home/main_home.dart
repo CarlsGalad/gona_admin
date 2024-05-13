@@ -11,7 +11,7 @@ import 'proccessed_order.dart';
 import 'sales_overview.dart';
 import 'shipped_orders.dart';
 import 'sub_screens/delivered_orders.dart';
-import 'sub_screens/pendening_orders.dart';
+import 'sub_screens/pending_orders.dart';
 import 'sub_screens/processed_orders.dart';
 import 'sub_screens/shipped_orders.dart';
 import 'top_locations.dart';

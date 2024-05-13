@@ -3,64 +3,64 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class ProcessedOrderScreen extends StatefulWidget {
-  const ProcessedOrderScreen({super.key});
+class PendingOrderScreen extends StatefulWidget {
+  const PendingOrderScreen({super.key});
 
   @override
-  ProcessedOrderScreenState createState() => ProcessedOrderScreenState();
+  PendingOrderScreenState createState() => PendingOrderScreenState();
 }
 
-class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
+class PendingOrderScreenState extends State<PendingOrderScreen> {
   DocumentSnapshot? _selectedOrder;
 
   Widget _buildOrdersListView() {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('orders').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final orders = snapshot.data!.docs
-                .where((doc) =>
-                    doc['orderStatus']['placed'] == true &&
-                    doc['orderStatus']['processed'] == true &&
-                    doc['orderStatus']['shipped'] == false &&
-                    doc['orderStatus']['delivered'] == false)
-                .toList();
-            if (orders.isEmpty) {
-              return const Center(
-                child: Text('There are no processed orders.'),
-              );
-            }
-            return ListView.builder(
-              itemCount: orders.length, // Number of processed orders
-              itemBuilder: (context, index) {
-                final order = orders[index];
-                final datePlaced =
-                    (order['precessed_date'] as Timestamp).toDate();
-                final timeAgo = timeago.format(datePlaced, allowFromNow: true);
-
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 70,
-                    color: Colors.white24,
-                    child: ListTile(
-                      title: Text('Order: ${order.id}'),
-                      trailing: Text('Placed $timeAgo'),
-                      onTap: () {
-                        setState(() {
-                          _selectedOrder = order;
-                        });
-                      },
-                    ),
-                  ),
-                );
-              },
+        stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final orders = snapshot.data!.docs
+              .where((doc) =>
+                  doc['orderStatus']['placed'] == true &&
+                  doc['orderStatus']['processed'] == false &&
+                  doc['orderStatus']['shipped'] == false &&
+                  doc['orderStatus']['delivered'] == false)
+              .toList();
+          if (orders.isEmpty) {
+            return const Center(
+              child: Text('There are no Pending orders yet!'),
             );
-          }),
+          }
+          return ListView.builder(
+            itemCount: orders.length, // Number of pending orders
+            itemBuilder: (context, index) {
+              final order = orders[index];
+              final datePlaced = (order['order_date'] as Timestamp).toDate();
+              final timeAgo = timeago.format(datePlaced, allowFromNow: true);
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 70,
+                  color: Colors.white,
+                  child: ListTile(
+                    title: Text('Order Id ${order.id}'),
+                    trailing: Text('Placed $timeAgo'),
+                    onTap: () {
+                      setState(() {
+                        _selectedOrder = order;
+                      });
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -72,7 +72,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white24,
+              color: Colors.white,
             ),
             child: const Padding(
               padding: EdgeInsets.all(8.0),
@@ -97,6 +97,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
               'Order ${order['order_id']}',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 10),
             const Text(
               'Order Details:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -121,7 +122,6 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
                 );
               },
             ),
-            const SizedBox(height: 10),
             const Text(
               'Shipping Information:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -137,16 +137,8 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text('Placed: ${orderStatus['placed']}'),
-            Text('Precessed: ${orderStatus['processed']}'),
             Text('Order Date: ${_formatTimestamp(order['order_date'])}'),
             Text('Total Amount: ${order['total_amount']}'),
-
-            ElevatedButton(
-              onPressed: () {
-                // Handle notify courier action
-              },
-              child: const Text('Notify Courier'),
-            ),
           ],
         ),
       ),
@@ -156,10 +148,9 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white24,
       appBar: AppBar(
         title: const Text(
-          'Processed Orders',
+          'Pending Orders',
           style: TextStyle(color: Colors.white),
         ),
         toolbarHeight: 50,
@@ -196,7 +187,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
               ),
               const VerticalDivider(
                 width: 1,
-                color: Colors.white24,
+                color: Colors.white,
               ),
               Expanded(
                 flex: 3,

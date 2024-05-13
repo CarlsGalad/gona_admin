@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gona_admin/home/sub_screens/delivered_orders.dart';
 import 'package:gona_admin/home/sub_screens/shipped_orders.dart';
 import 'main_home.dart';
-import 'sub_screens/pendening_orders.dart';
+import 'sub_screens/pending_orders.dart';
 import 'sub_screens/processed_orders.dart';
 
 class HomeScreen extends StatefulWidget {
