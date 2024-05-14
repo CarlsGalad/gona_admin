@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_network/image_network.dart';
 
 class OurUsersScreen extends StatefulWidget {
   const OurUsersScreen({super.key});
@@ -93,7 +94,12 @@ class OurUsersScreenState extends State<OurUsersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (user['imagePath'] != null) Image.network(user['imagePath']),
+            if (user['imagePath'] != null)
+              ImageNetwork(
+                image: user['imagePath'] ?? '',
+                width: 200,
+                height: 200,
+              ),
             Text(
               '${user['firstName']} ${user['lastName']}',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
