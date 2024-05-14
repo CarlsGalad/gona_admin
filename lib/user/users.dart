@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class OurUsersScreen extends StatefulWidget {
@@ -9,6 +10,20 @@ class OurUsersScreen extends StatefulWidget {
 
 class OurUsersScreenState extends State<OurUsersScreen> {
   int? _selectedUserIndex;
+  List<DocumentSnapshot> _users = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();
+  }
+
+  Future<void> _fetchUsers() async {
+    final snapshot = await FirebaseFirestore.instance.collection('users').get();
+    setState(() {
+      _users = snapshot.docs;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +62,15 @@ class OurUsersScreenState extends State<OurUsersScreen> {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: ListView.builder(
-        itemCount: 10, // Number of users
+        itemCount: _users.length, // Number of users
         itemBuilder: (context, index) {
+          final user = _users[index];
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
             child: Container(
               decoration: const BoxDecoration(color: Colors.grey),
               child: ListTile(
-                title: Text('User $index'),
+                title: Text('${user['firstName']} ${user['lastName']}'),
                 onTap: () {
                   setState(() {
                     _selectedUserIndex = index;
@@ -69,56 +85,68 @@ class OurUsersScreenState extends State<OurUsersScreen> {
   }
 
   Widget _buildUserDetailsView() {
+    final user = _users[_selectedUserIndex!];
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (user['imagePath'] != null) Image.network(user['imagePath']),
             Text(
-              'User ${_selectedUserIndex!} Image',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'User ${_selectedUserIndex!} Names',
+              '${user['firstName']} ${user['lastName']}',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
-              'Email: user$_selectedUserIndex@example.com',
+              'Email: ${user['email']}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Mobile: ${user['mobile']}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Address: ${user['address']}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 5),
             const Text(
-              'Adrress: Selected Users address',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              'Last 5 Purchase:',
+              'Last 5 Purchases:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            _buildLastPurchase(),
+            _buildLastPurchases(user['purchase_history'] ?? []),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLastPurchase() {
-    // Simulated last purchase data
-    return const Card(
-      child: ListTile(
-        title: Text('Product Name'),
-        subtitle: Column(
-          children: [
-            Text('Price: \$100'),
-            Text('Qty: 13'),
-          ],
-        ),
-        trailing: Text('Date: 2024-05-10'),
-      ),
+  Widget _buildLastPurchases(List<dynamic> purchases) {
+    if (purchases.isEmpty) {
+      return const Text('No purchases available');
+    }
+
+    return Column(
+      children: purchases.take(5).map((purchase) {
+        return Card(
+          child: ListTile(
+            title: Text(purchase['productName'] ?? 'No Product Name'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Price: \$${purchase['price'] ?? 'N/A'}'),
+                Text('Qty: ${purchase['quantity'] ?? 'N/A'}'),
+              ],
+            ),
+            trailing: Text('Date: ${purchase['date'] ?? 'No Date'}'),
+          ),
+        );
+      }).toList(),
     );
   }
 }

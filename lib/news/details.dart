@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:image_network/image_network.dart';
 
 import 'model.dart';
 
-class NewsDetailScreen extends StatelessWidget {
+class NewsDetailScreen extends StatefulWidget {
   final NewsItem newsItem;
 
   const NewsDetailScreen({super.key, required this.newsItem});
 
+  @override
+  State<NewsDetailScreen> createState() => _NewsDetailScreenState();
+}
+
+class _NewsDetailScreenState extends State<NewsDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -17,27 +23,30 @@ class NewsDetailScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 40.0, top: 50),
-            child: Text(newsItem.title),
+            child: Text(
+              widget.newsItem.title,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30),
+            ),
           ),
-          Image.network(
-            newsItem.imageUrl,
+          ImageNetwork(
+            image: widget.newsItem.imageUrl,
             height: 300,
             width: 500,
-            fit: BoxFit.cover,
           ),
           const SizedBox(height: 16.0),
           Text(
-            'By ${newsItem.author} • ${newsItem.timePosted}',
+            'By ${widget.newsItem.author} • ${widget.newsItem.timePosted}',
             style: const TextStyle(
               color: Colors.grey,
             ),
           ),
           const SizedBox(height: 16.0),
           Text(
-            newsItem.content,
-            style: const TextStyle(
-              fontSize: 16.0,
-            ),
+            widget.newsItem.content,
+            style: const TextStyle(fontSize: 16.0, color: Colors.white70),
           ),
         ],
       ),

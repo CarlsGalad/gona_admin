@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:gona_admin/home/home_screen.dart';
 
-import '../category.dart';
+import '../categories/category.dart';
 import '../disputes/disputes.dart';
 import '../mails/gonamails.dart';
 import '../news/gonanews.dart';
