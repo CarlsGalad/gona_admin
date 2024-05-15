@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_network/image_network.dart';
+import 'package:intl/intl.dart';
 
 class OurUsersScreen extends StatefulWidget {
   const OurUsersScreen({super.key});
@@ -23,6 +24,15 @@ class OurUsersScreenState extends State<OurUsersScreen> {
     final snapshot = await FirebaseFirestore.instance.collection('users').get();
     setState(() {
       _users = snapshot.docs;
+    });
+  }
+
+  Future<void> _deleteUser(int index) async {
+    final user = _users[index];
+    await FirebaseFirestore.instance.collection('users').doc(user.id).delete();
+    setState(() {
+      _users.removeAt(index);
+      _selectedUserIndex = null;
     });
   }
 
@@ -66,17 +76,45 @@ class OurUsersScreenState extends State<OurUsersScreen> {
         itemCount: _users.length, // Number of users
         itemBuilder: (context, index) {
           final user = _users[index];
+          final firstName = user['firstName'] ?? 'First Name';
+          final lastName = user['lastName'] ?? 'Last Name';
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
             child: Container(
               decoration: const BoxDecoration(color: Colors.grey),
               child: ListTile(
-                title: Text('${user['firstName']} ${user['lastName']}'),
+                title: Text('$firstName $lastName'),
                 onTap: () {
                   setState(() {
                     _selectedUserIndex = index;
                   });
                 },
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Delete User'),
+                        content: const Text(
+                            'Are you sure you want to delete this user?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text('Delete'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      _deleteUser(index);
+                    }
+                  },
+                ),
               ),
             ),
           );
@@ -88,35 +126,45 @@ class OurUsersScreenState extends State<OurUsersScreen> {
   Widget _buildUserDetailsView() {
     final user = _users[_selectedUserIndex!];
 
+    final String imagePath = user['imagePath'] ?? '';
+    final String firstName = user['firstName'] ?? 'First Name';
+    final String lastName = user['lastName'] ?? 'Last Name';
+    final String email = user['email'] ?? 'No email provided';
+    final String mobile = user['mobile'] ?? 'No mobile number provided';
+    final String address = user['address'] ?? 'No address provided';
+    final List<dynamic> purchaseHistory = user['purchase_history'] ?? [];
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (user['imagePath'] != null)
+            if (imagePath.isNotEmpty)
               ImageNetwork(
-                image: user['imagePath'] ?? '',
+                image: imagePath,
                 width: 200,
                 height: 200,
+                fitWeb: BoxFitWeb.cover,
+                borderRadius: BorderRadius.circular(10),
               ),
             Text(
-              '${user['firstName']} ${user['lastName']}',
+              '$firstName $lastName',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
-              'Email: ${user['email']}',
+              'Email: $email',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 5),
             Text(
-              'Mobile: ${user['mobile']}',
+              'Mobile: $mobile',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 5),
             Text(
-              'Address: ${user['address']}',
+              'Address: $address',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 5),
@@ -125,7 +173,7 @@ class OurUsersScreenState extends State<OurUsersScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            _buildLastPurchases(user['purchase_history'] ?? []),
+            _buildLastPurchases(purchaseHistory),
           ],
         ),
       ),
@@ -139,17 +187,21 @@ class OurUsersScreenState extends State<OurUsersScreen> {
 
     return Column(
       children: purchases.take(5).map((purchase) {
+        final DateTime orderDate =
+            (purchase['order_date'] as Timestamp).toDate();
+        final formattedDate =
+            DateFormat('yyyy-MM-dd – kk:mm').format(orderDate);
+
         return Card(
           child: ListTile(
-            title: Text(purchase['productName'] ?? 'No Product Name'),
+            title: Text('Order ID: ${purchase['order_id']}'),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Price: \$${purchase['price'] ?? 'N/A'}'),
-                Text('Qty: ${purchase['quantity'] ?? 'N/A'}'),
+                Text('Total Amount: ₦${purchase['total_amount']}'),
+                Text('Order Date: $formattedDate'),
               ],
             ),
-            trailing: Text('Date: ${purchase['date'] ?? 'No Date'}'),
           ),
         );
       }).toList(),
