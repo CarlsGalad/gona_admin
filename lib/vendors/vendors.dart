@@ -64,6 +64,28 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
     });
   }
 
+  Future<void> _deleteItem(int index) async {
+    final item = _vendorItems[index];
+    final imageUrl = item['itemPath'] as String?;
+
+    // Delete the image from Firebase Storage if it exists
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      try {
+        final ref = FirebaseStorage.instance.refFromURL(imageUrl);
+        await ref.delete();
+      } catch (e) {
+        print('Failed to delete item image: $e');
+      }
+    }
+
+    // Delete the item document
+    await FirebaseFirestore.instance.collection('Items').doc(item.id).delete();
+
+    setState(() {
+      _vendorItems.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -279,14 +301,46 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
                 Text(
                   'Selling Method: $sellingMethod',
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 10,
                   ),
                 ),
-                Text(
-                  'Farming Year: ${farmingYear.toString()}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Farming Year: ${farmingYear.toString()}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete Item'),
+                            content: const Text(
+                                'Are you sure you want to delete this item?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          _deleteItem(index);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

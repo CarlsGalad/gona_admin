@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,6 +38,27 @@ class CreateNewsState extends State<CreateNews> {
       return;
     }
 
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      // Handle the case where the user is not signed in
+      print('No user signed in');
+      return;
+    }
+
+    final userId = currentUser.uid;
+    final adminDoc =
+        await FirebaseFirestore.instance.collection('admin').doc(userId).get();
+    if (!adminDoc.exists) {
+      // Handle the case where the admin document does not exist
+      print('Admin document does not exist');
+      return;
+    }
+
+    final adminData = adminDoc.data();
+    final String firstName = adminData?['firstName'] ?? 'Unknown';
+    final String lastName = adminData?['lastName'] ?? 'Publisher';
+    final String publisher = '$firstName $lastName';
+
     final storage = FirebaseStorage.instance;
     final timeStamp = DateTime.now().millisecondsSinceEpoch;
     final ref = storage.ref().child('news_images/$timeStamp.jpg');
@@ -50,7 +72,7 @@ class CreateNewsState extends State<CreateNews> {
       'title': _titleController.text,
       'content': _contentController.text,
       'image_url': imageUrl,
-      'publisher': 'YourPublisher', // Change this to the actual publisher
+      'publisher': publisher, // Change this to the actual publisher
       'date_published': Timestamp.now(), // Firestore timestamp
     };
 
