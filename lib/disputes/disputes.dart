@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ManageDisputesScreen extends StatefulWidget {
@@ -46,27 +47,42 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
   Widget _buildDisputesListView() {
     return Padding(
       padding: const EdgeInsets.all(12.0),
-      child: ListView.builder(
-        itemCount: 10, // Number of disputes
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.grey),
-              child: ListTile(
-                title: Text('Dispute $index'),
-                onTap: () {
-                  setState(
-                    () {
-                      _selectedDisputeIndex = index;
-                    },
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      ),
+      child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('disputes')
+              .orderBy('timestamp', descending: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: LinearProgressIndicator());
+            }
+
+            final disputes = snapshot.data!.docs;
+            return ListView.builder(
+              itemCount: disputes.length, // Number of disputes
+              itemBuilder: (context, index) {
+                 final dispute = disputes[index];
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
+                  child: Container(
+                    decoration: const BoxDecoration(color: Colors.grey),
+                    child: ListTile(
+                       title: Text('Category: ${dispute['category']}'),
+                      trailing: Text('Status: ${dispute['status']}'),
+                      onTap: () {
+                        setState(
+                          () {
+                            _selectedDisputeIndex = index;
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
     );
   }
 
