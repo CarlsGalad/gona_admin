@@ -56,8 +56,7 @@ class ChatPlaceholderWidgetState extends State<ChatPlaceholderWidget> {
                       future: _fetchUserNames(),
                       builder: (context, userSnapshot) {
                         if (!userSnapshot.hasData) {
-                          return const Center(
-                              child: CircularProgressIndicator());
+                          return const Center(child: LinearProgressIndicator());
                         }
                         return StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance
@@ -66,7 +65,7 @@ class ChatPlaceholderWidgetState extends State<ChatPlaceholderWidget> {
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
                               return const Center(
-                                  child: CircularProgressIndicator());
+                                  child: LinearProgressIndicator());
                             }
                             final chats = snapshot.data!.docs;
 
@@ -150,7 +149,7 @@ class ChatPlaceholderWidgetState extends State<ChatPlaceholderWidget> {
                                 builder: (context, snapshot) {
                                   if (!snapshot.hasData) {
                                     return const Center(
-                                        child: CircularProgressIndicator());
+                                        child: LinearProgressIndicator());
                                   }
                                   final messages = snapshot.data!.docs;
                                   return ListView.builder(

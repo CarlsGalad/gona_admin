@@ -36,7 +36,7 @@ class NewsScreenState extends State<NewsScreen> {
                     FirebaseFirestore.instance.collection('news').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: LinearProgressIndicator());
                   }
 
                   final newsDocs = snapshot.data!.docs;
