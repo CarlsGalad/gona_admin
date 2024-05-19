@@ -209,12 +209,16 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
                               AsyncSnapshot<String> snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const CircularProgressIndicator(); // Placeholder for loading state
+                              return LinearProgressIndicator(
+                                  color: Colors.blue[
+                                      200]); // Placeholder for loading state
                             } else if (snapshot.hasError) {
                               return const Text(
                                   'Error loading image'); // Placeholder for error state
                             } else {
                               return ImageNetwork(
+                                onLoading: LinearProgressIndicator(
+                                    color: Colors.blue[200]),
                                 image: snapshot.data!,
                                 height: 100,
                                 width: 200,
@@ -340,7 +344,8 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+              child: LinearProgressIndicator(color: Colors.blue[200]));
         }
 
         final subcategories = snapshot.data!.docs;

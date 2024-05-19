@@ -4,9 +4,10 @@ import 'package:gona_admin/home/home_screen.dart';
 
 import '../categories/category.dart';
 import '../disputes/disputes.dart';
-import '../mails/gonamails.dart';
+
+import '../marketing/marketing.dart';
 import '../news/gonanews.dart';
-import '../live_chat.dart';
+import '../help/live_chat.dart';
 import '../user/users.dart';
 import '../vendors/vendors.dart';
 
@@ -38,7 +39,7 @@ class _AdminHomeState extends State<AdminHome> {
         screen = const ManageCategoryScreen();
         break;
       case 5:
-        screen = const GonaMailsScreen();
+        screen = const MarketingScreen();
         break;
       case 6:
         screen = const OurVendorsScreen();
@@ -142,8 +143,8 @@ class _AdminHomeState extends State<AdminHome> {
                               label: Text('Manage Loans'),
                             ),
                             NavigationRailDestination(
-                              icon: Icon(Icons.mail),
-                              label: Text('Gona Mails'),
+                              icon: Icon(Icons.trending_up),
+                              label: Text('Marketing'),
                             ),
                             NavigationRailDestination(
                               icon: Icon(Icons.people),
