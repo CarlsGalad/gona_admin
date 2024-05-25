@@ -133,39 +133,49 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.black,
-      width: MediaQuery.of(context).size.width - 180,
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: _buildCategoriesGridView(),
+      width: MediaQuery.of(context).size.width - 150,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Categories',
+            style: TextStyle(fontSize: 20),
           ),
-          const VerticalDivider(
-            thickness: 1,
-            width: 2,
-            color: Colors.grey,
-          ),
-          Expanded(
-            flex: 3,
-            child: _selectedCategoryIndex == null
-                ? Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text(
-                          'Please select a category',
-                          style: TextStyle(color: Colors.blueGrey),
+          toolbarHeight: 50,
+          elevation: 5,
+        ),
+        body: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _buildCategoriesGridView(),
+            ),
+            const VerticalDivider(
+              thickness: 1,
+              width: 2,
+              color: Colors.grey,
+            ),
+            Expanded(
+              flex: 3,
+              child: _selectedCategoryIndex == null
+                  ? Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(
+                            'Please select a category',
+                            style: TextStyle(color: Colors.blueGrey),
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                : _buildSubcategoriesListView(),
-          ),
-        ],
+                    )
+                  : _buildSubcategoriesListView(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -345,13 +355,16 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
-              child: LinearProgressIndicator(color: Colors.blue[200]));
+              child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 50.0),
+            child: LinearProgressIndicator(color: Colors.blue[200]),
+          ));
         }
 
         final subcategories = snapshot.data!.docs;
 
         return Scaffold(
-          backgroundColor: Colors.black54,
+          backgroundColor: Colors.white,
           body: ListView.builder(
             itemCount: subcategories.length,
             itemBuilder: (context, index) {
@@ -359,7 +372,7 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  decoration: const BoxDecoration(color: Colors.blueGrey),
+                  decoration: BoxDecoration(color: Colors.blue[200]),
                   child: ListTile(
                     title: Text(subcategory['name']),
                     trailing: Row(

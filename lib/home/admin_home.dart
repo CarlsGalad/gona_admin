@@ -19,6 +19,7 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHomeState extends State<AdminHome> {
+  final _searchBarController = TextEditingController();
   int _selectedIndex = 0;
 
   @override
@@ -93,6 +94,50 @@ class _AdminHomeState extends State<AdminHome> {
         ),
         backgroundColor: Colors.black,
         foregroundColor: Colors.black54,
+        actions: [
+          SearchBar(
+            backgroundColor:
+                MaterialStateColor.resolveWith((states) => Colors.black26),
+            textCapitalization: TextCapitalization.sentences,
+            constraints: const BoxConstraints(
+                maxHeight: 40, maxWidth: 300, minHeight: 40, minWidth: 250),
+            trailing: const [
+              Padding(
+                padding: EdgeInsets.only(right: 10.0),
+                child: Icon(
+                  Icons.search,
+                  color: Colors.grey,
+                ),
+              )
+            ],
+            controller: _searchBarController,
+            textStyle: MaterialStateProperty.resolveWith(
+                (states) => const TextStyle(color: Colors.white)),
+            hintText: 'Search ',
+            hintStyle: MaterialStateProperty.resolveWith(
+                (states) => const TextStyle(color: Colors.grey)),
+          ),
+          const SizedBox(
+            width: 200,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0, left: 8),
+            child: IconButton(
+                color: Colors.grey,
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none)),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 30.0, left: 4),
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.account_box,
+                color: Colors.grey,
+              ),
+            ),
+          )
+        ],
       ),
       body: Row(
         children: [
@@ -112,9 +157,9 @@ class _AdminHomeState extends State<AdminHome> {
                           unselectedLabelTextStyle:
                               const TextStyle(color: Colors.grey, fontSize: 13),
                           selectedLabelTextStyle:
-                              const TextStyle(color: Colors.white),
+                              const TextStyle(color: Colors.blue),
                           unselectedIconTheme:
-                              const IconThemeData(color: Colors.white),
+                              const IconThemeData(color: Colors.blue),
                           onDestinationSelected: (int index) {
                             setState(() {
                               _selectedIndex = index;
@@ -169,10 +214,6 @@ class _AdminHomeState extends State<AdminHome> {
                   width: 1,
                   color: Color.fromARGB(255, 26, 25, 25),
                 ),
-                // // This is the main content.  if (_selectedIndex ==
-                //               1) // Check if Live Chat is selected
-                //             const ChatPlaceholderWidget(), // Render ChatPlaceholderWidget
-                //           if (_selectedIndex !=1)
                 screen,
               ],
             ),
