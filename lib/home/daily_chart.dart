@@ -1,5 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class DailyChart extends StatefulWidget {
   const DailyChart({super.key});
@@ -9,11 +11,88 @@ class DailyChart extends StatefulWidget {
 }
 
 class _DailyChartState extends State<DailyChart> {
+  List<BarChartGroupData> barGroups = [];
+  List<String> daysOfWeek = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSalesData();
+  }
+
+  Future<void> _fetchSalesData() async {
+    // Get the current date and the date 7 days ago
+    DateTime now = DateTime.now();
+    DateTime startDate = now.subtract(const Duration(days: 6));
+
+    // Initialize a map to store sales data
+    Map<String, int> salesData = {
+      for (int i = 0; i < 7; i++)
+        DateFormat('EEE').format(startDate.add(Duration(days: i))): 0
+    };
+
+    try {
+      // Query the sales collection for the last 7 days
+      QuerySnapshot salesSnapshot = await FirebaseFirestore.instance
+          .collection('sales')
+          .where('saleDate', isGreaterThanOrEqualTo: startDate)
+          .get();
+
+      // Sum up the sales for each day
+      for (var doc in salesSnapshot.docs) {
+        Timestamp saleDate = doc['saleDate'];
+        DateTime saleDateTime = saleDate.toDate();
+        String day = DateFormat('EEE').format(saleDateTime);
+        if (salesData.containsKey(day)) {
+          salesData[day] = (salesData[day] ?? 0) + doc['quantity'] as int;
+        }
+      }
+
+      // Create the bar chart groups
+      List<String> sortedDaysOfWeek = salesData.keys.toList();
+      sortedDaysOfWeek.sort((a, b) => DateFormat('EEE')
+          .parse(a)
+          .weekday
+          .compareTo(DateFormat('EEE').parse(b).weekday));
+      barGroups = sortedDaysOfWeek.asMap().entries.map((entry) {
+        int index = entry.key;
+        String day = entry.value;
+        return BarChartGroupData(
+          x: index,
+          barRods: [
+            BarChartRodData(
+              toY: salesData[day]?.toDouble() ?? 0.0,
+              width: 25,
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                colors: [
+                  Colors.amber,
+                  Colors.green,
+                  Colors.lightGreen,
+                  Colors.lightBlue,
+                  Colors.blue
+                ],
+              ),
+            ),
+          ],
+        );
+      }).toList();
+
+      // Update the state with the new data
+      setState(() {
+        daysOfWeek = sortedDaysOfWeek;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching sales data: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
-      // implement the bar chart
       child: Column(
         children: [
           Container(
@@ -53,164 +132,63 @@ class _DailyChartState extends State<DailyChart> {
             child: Padding(
               padding: const EdgeInsets.only(
                   top: 20.0, right: 10, bottom: 10, left: 10),
-              child: BarChart(
-                BarChartData(
-                  titlesData: FlTitlesData(
-                      show: true,
-                      topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : BarChart(
+                      BarChartData(
+                        titlesData: FlTitlesData(
+                          show: true,
+                          topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: const SideTitles(
+                              showTitles: true,
+                              reservedSize: 30,
+                            ),
+                            axisNameWidget: Text(
+                              'Sales',
+                              style: TextStyle(color: Colors.grey[300]),
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 30,
+                              getTitlesWidget: (value, meta) {
+                                if (value < 0 || value >= daysOfWeek.length) {
+                                  return Container();
+                                }
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    daysOfWeek[value.toInt()],
+                                    style: TextStyle(color: Colors.grey[300]),
+                                  ),
+                                );
+                              },
+                            ),
+                            axisNameWidget: Text(
+                              'Last Seven Days',
+                              style: TextStyle(color: Colors.grey[300]),
+                            ),
+                          ),
+                        ),
+                        borderData: FlBorderData(
+                          border: const Border(
+                            top: BorderSide.none,
+                            right: BorderSide.none,
+                            left: BorderSide(width: 1, color: Colors.grey),
+                            bottom: BorderSide(width: 1, color: Colors.grey),
+                          ),
+                        ),
+                        groupsSpace: 10,
+                        barGroups: barGroups,
                       ),
-                      rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      leftTitles: AxisTitles(
-                          sideTitles: const SideTitles(
-                              showTitles: true, reservedSize: 30),
-                          axisNameWidget: Text(
-                            'Sales',
-                            style: TextStyle(color: Colors.grey[300]),
-                          )),
-                      bottomTitles: AxisTitles(
-                          sideTitles: const SideTitles(
-                              showTitles: true, reservedSize: 30),
-                          axisNameWidget: Text(
-                            'Last Seven Days',
-                            style: TextStyle(color: Colors.grey[300]),
-                          ))),
-                  borderData: FlBorderData(
-                      border: const Border(
-                    top: BorderSide.none,
-                    right: BorderSide.none,
-                    left: BorderSide(width: 1, color: Colors.grey),
-                    bottom: BorderSide(width: 1, color: Colors.grey),
-                  )),
-                  groupsSpace: 10,
-
-                  // add bars
-                  barGroups: [
-                    BarChartGroupData(x: 1, barsSpace: 10, barRods: [
-                      BarChartRodData(
-                        toY: 10,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                    BarChartGroupData(x: 2, barRods: [
-                      BarChartRodData(
-                        toY: 9,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                    BarChartGroupData(x: 3, barRods: [
-                      BarChartRodData(
-                        toY: 4,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                    BarChartGroupData(x: 4, barRods: [
-                      BarChartRodData(
-                        toY: 2,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                    BarChartGroupData(x: 5, barRods: [
-                      BarChartRodData(
-                        toY: 13,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                    BarChartGroupData(x: 6, barRods: [
-                      BarChartRodData(
-                        toY: 17,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                    BarChartGroupData(x: 7, barRods: [
-                      BarChartRodData(
-                        toY: 19,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                    BarChartGroupData(x: 8, barRods: [
-                      BarChartRodData(
-                        toY: 21,
-                        width: 25,
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            colors: [
-                              Colors.amber,
-                              Colors.green,
-                              Colors.lightGreen,
-                              Colors.lightBlue,
-                              Colors.blue
-                            ]),
-                      ),
-                    ]),
-                  ],
-                ),
-              ),
+                    ),
             ),
           ),
         ],

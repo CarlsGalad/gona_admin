@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:gona_admin/home/topitems.dart';
 
-import '../welcomemsg.dart';
+
 import 'daily_chart.dart';
 import 'delivered_orders.dart';
 import 'new_users_tile.dart';
@@ -33,9 +33,6 @@ class _MainHomeState extends State<MainHome> {
         color: Colors.black54,
         child: Column(
           children: [
-            const WelcomeBackWidget(),
-
-            // Render other content if not Live Chat
             Container(
               decoration: const BoxDecoration(
                   color: Color.fromARGB(255, 26, 25, 25),

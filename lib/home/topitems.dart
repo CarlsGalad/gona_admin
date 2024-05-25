@@ -1,27 +1,55 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TopItems extends StatefulWidget {
-  const TopItems({Key? key}) : super(key: key);
+  const TopItems({super.key});
 
   @override
   State<TopItems> createState() => _TopItemsState();
 }
 
 class _TopItemsState extends State<TopItems> {
+  Future<List<Map<String, dynamic>>> _fetchTopItems() async {
+    // Query the sales collection to get all sales data
+    QuerySnapshot salesSnapshot =
+        await FirebaseFirestore.instance.collection('sales').get();
+
+    // Aggregate sales data by itemId
+    Map<String, Map<String, dynamic>> itemSales = {};
+
+    for (var doc in salesSnapshot.docs) {
+      String itemId = doc['itemId'];
+      int quantity = doc['quantity'];
+
+      // Get item details
+      DocumentSnapshot itemDoc = await FirebaseFirestore.instance
+          .collection('items')
+          .doc(itemId)
+          .get();
+      if (itemDoc.exists) {
+        String itemName = itemDoc['name'];
+        String vendorName = itemDoc['itemFarm'];
+
+        if (!itemSales.containsKey(itemId)) {
+          itemSales[itemId] = {
+            'itemName': itemName,
+            'vendorName': vendorName,
+            'quantitySold': 0
+          };
+        }
+        itemSales[itemId]!['quantitySold'] += quantity;
+      }
+    }
+
+    // Convert to list and sort by quantity sold
+    List<Map<String, dynamic>> topItems = itemSales.values.toList();
+    topItems.sort((a, b) => b['quantitySold'].compareTo(a['quantitySold']));
+
+    return topItems;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Dummy data for placeholders
-    List<Map<String, dynamic>> topItemsData = [
-      {'itemName': 'Item 1', 'quantitySold': 100, 'vendorName': 'Vendor A'},
-      {'itemName': 'Item 2', 'quantitySold': 90, 'vendorName': 'Vendor B'},
-      {'itemName': 'Item 1', 'quantitySold': 900, 'vendorName': 'Vendor A'},
-      {'itemName': 'Item 1', 'quantitySold': 100, 'vendorName': 'Vendor A'},
-      {'itemName': 'Item 1', 'quantitySold': 160, 'vendorName': 'Vendor A'},
-      {'itemName': 'Item 1', 'quantitySold': 100, 'vendorName': 'Vendor A'},
-      // Add more dummy data here
-    ];
-
-    //top sold items
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -47,32 +75,53 @@ class _TopItemsState extends State<TopItems> {
                 const SizedBox(height: 10),
                 // List
                 SizedBox(
-                  height: 550,
-                  child: ListView.builder(
-                    itemCount: topItemsData.length,
-                    itemBuilder: (context, index) {
-                      final item = topItemsData[index];
-                      return ListTile(
-                        title: Text(
-                          item['itemName'],
-                          style: const TextStyle(
-                              color: Colors.blueGrey, fontSize: 13),
-                          softWrap: false,
-                        ),
-                        subtitle: Text(
-                          'Quantity Sold: ${item['quantitySold']}',
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 10),
-                          softWrap: false,
-                        ),
-                        trailing: Text(
-                          'Vendor: ${item['vendorName']}',
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 10),
-                          softWrap: false,
-                        ),
-                      );
-                    },
+                  height: 600,
+                  child: Expanded(
+                    child: FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _fetchTopItems(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (snapshot.data!.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'No top items available',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }
+
+                        final topItemsData = snapshot.data!;
+                        return ListView.builder(
+                          itemCount: topItemsData.length,
+                          itemBuilder: (context, index) {
+                            final item = topItemsData[index];
+                            return ListTile(
+                              title: Text(
+                                item['itemName'],
+                                style: const TextStyle(
+                                    color: Colors.blueGrey, fontSize: 13),
+                                softWrap: false,
+                              ),
+                              subtitle: Text(
+                                'Quantity Sold: ${item['quantitySold']}',
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 10),
+                                softWrap: false,
+                              ),
+                              trailing: Text(
+                                'Vendor: ${item['vendorName']}',
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 10),
+                                softWrap: false,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],

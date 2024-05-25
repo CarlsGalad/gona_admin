@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TotalSalesTile extends StatefulWidget {
   const TotalSalesTile({super.key});
@@ -8,6 +9,32 @@ class TotalSalesTile extends StatefulWidget {
 }
 
 class _TotalSalesTileState extends State<TotalSalesTile> {
+  int totalSales = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTotalSales();
+  }
+
+  Future<void> _fetchTotalSales() async {
+    int salesSum = 0;
+
+    // Query the sales collection
+    QuerySnapshot salesSnapshot =
+        await FirebaseFirestore.instance.collection('sales').get();
+
+    // Sum up the quantity of all sales
+    for (var doc in salesSnapshot.docs) {
+      salesSum += doc['quantity'] as int;
+    }
+
+    // Update the state with the total sales
+    setState(() {
+      totalSales = salesSum;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,13 +51,13 @@ class _TotalSalesTileState extends State<TotalSalesTile> {
           ]),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Padding(
-          padding: EdgeInsets.only(left: 15),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.only(top: 10.0, right: 10),
                 child: Icon(
                   Icons.money_sharp,
@@ -39,10 +66,10 @@ class _TotalSalesTileState extends State<TotalSalesTile> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 5.0, right: 10),
+                padding: const EdgeInsets.only(top: 5.0, right: 10),
                 child: Text(
-                  '₦150,000', // Display the total sales count
-                  style: TextStyle(
+                  '₦$totalSales', // Display the total sales count
+                  style: const TextStyle(
                       fontSize: 30,
                       color: Colors.white,
                       fontWeight: FontWeight.bold),
@@ -50,8 +77,8 @@ class _TotalSalesTileState extends State<TotalSalesTile> {
                   softWrap: false,
                 ),
               ),
-              Spacer(),
-              Padding(
+              const Spacer(),
+              const Padding(
                 padding: EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'Total Sales',
