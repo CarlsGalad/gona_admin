@@ -21,11 +21,22 @@ class ChatPlaceholderWidgetState extends State<ChatPlaceholderWidget> {
 
   Future<Map<String, String>> _fetchUserNames() async {
     Map<String, String> userNames = {};
+
     final usersSnapshot =
         await FirebaseFirestore.instance.collection('users').get();
     for (var user in usersSnapshot.docs) {
       userNames[user.id] = "${user['firstName']} ${user['lastName']}";
     }
+
+    // Fetch farms from the 'farms' collection
+    final farmsSnapshot =
+        await FirebaseFirestore.instance.collection('farms').get();
+    for (var farm in farmsSnapshot.docs) {
+      if (!userNames.containsKey(farm.id)) {
+        userNames[farm.id] = farm['farmName'];
+      }
+    }
+
     return userNames;
   }
 
@@ -84,19 +95,35 @@ class ChatPlaceholderWidgetState extends State<ChatPlaceholderWidget> {
                                   final senderName =
                                       userSnapshot.data![chat['senderId']] ??
                                           'Unknown';
-                                  return Container(
-                                    color: Colors.black26,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ListTile(
-                                        title: Text(chat['title']),
-                                        subtitle: Text(senderName),
-                                        onTap: () {
-                                          setState(() {
-                                            selectedChatId = chat.id;
-                                            selectedChatTitle = chat['title'];
-                                          });
-                                        },
+                                  bool isNewChat = (DateTime.now()
+                                          .difference(
+                                              chat['timestamp'].toDate())
+                                          .inHours <=
+                                      24);
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      color: isNewChat
+                                          ? Colors.black45
+                                          : Colors.black26,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ListTile(
+                                          title: Text(
+                                            chat['title'],
+                                            style: TextStyle(
+                                                fontWeight: isNewChat
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal),
+                                          ),
+                                          subtitle: Text(senderName),
+                                          onTap: () {
+                                            setState(() {
+                                              selectedChatId = chat.id;
+                                              selectedChatTitle = chat['title'];
+                                            });
+                                          },
+                                        ),
                                       ),
                                     ),
                                   );
