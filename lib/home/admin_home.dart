@@ -125,15 +125,22 @@ class _AdminHomeState extends State<AdminHome> {
             child: IconButton(
                 color: Colors.grey,
                 onPressed: () {},
+                icon: const Icon(Icons.history)),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0, left: 8),
+            child: IconButton(
+                color: Colors.grey,
+                onPressed: () {},
                 icon: const Icon(Icons.notifications_none)),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 30.0, left: 4),
             child: IconButton(
+              color: Colors.grey,
               onPressed: () {},
               icon: const Icon(
                 Icons.account_box,
-                color: Colors.grey,
               ),
             ),
           )
