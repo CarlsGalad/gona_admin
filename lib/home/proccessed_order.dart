@@ -9,7 +9,7 @@ class ProcessedCountTile extends StatefulWidget {
 }
 
 class _ProcessedCountTileState extends State<ProcessedCountTile> {
-  int _ProcessedOrdersCount = 0;
+  int _processedOrdersCount = 0;
 
   @override
   void initState() {
@@ -21,10 +21,16 @@ class _ProcessedCountTileState extends State<ProcessedCountTile> {
     final QuerySnapshot<Map<String, dynamic>> querySnapshot =
         await FirebaseFirestore.instance
             .collection('orders')
+            .where('orderStatus.place', isEqualTo: true)
             .where('orderStatus.processed', isEqualTo: true)
+            .where('orderStatus.picked', isEqualTo: false)
+            .where('orderStatus.shipped', isEqualTo: false)
+            .where('orderStatus.hubNear', isEqualTo: false)
+            .where('orderStatus.enroute', isEqualTo: false)
+            .where('orderStatus.delivered', isEqualTo: false)
             .get();
     setState(() {
-      _ProcessedOrdersCount = querySnapshot.size;
+      _processedOrdersCount = querySnapshot.size;
     });
   }
 
@@ -66,7 +72,7 @@ class _ProcessedCountTileState extends State<ProcessedCountTile> {
               Padding(
                 padding: const EdgeInsets.only(top: 1.0, right: 10),
                 child: Text(
-                  '$_ProcessedOrdersCount', // Display the count orders with status as process order
+                  '$_processedOrdersCount', // Display the count orders with status as process order
                   style: const TextStyle(
                       fontSize: 30,
                       color: Colors.white,

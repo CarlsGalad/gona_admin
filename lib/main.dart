@@ -4,12 +4,21 @@ import 'package:gona_admin/account_creation/auth_page.dart';
 
 import 'package:gona_admin/firebase_options.dart';
 
+import 'watcher.dart';
+
 // import 'home/admin_home.dart';
 
 void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Create an instance of the OrderWatcherService
+  OrderWatcherService orderWatcherService = OrderWatcherService();
+
+  // Start watching order items
+  orderWatcherService.startWatching();
+
   runApp(const GonaAdmin());
 }
 

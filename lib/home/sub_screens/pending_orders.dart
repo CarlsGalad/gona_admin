@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../watcher.dart';
+
 class PendingOrderScreen extends StatefulWidget {
   const PendingOrderScreen({super.key});
 
@@ -12,6 +14,13 @@ class PendingOrderScreen extends StatefulWidget {
 
 class PendingOrderScreenState extends State<PendingOrderScreen> {
   DocumentSnapshot? _selectedOrder;
+  final OrderWatcherService _orderWatcherService = OrderWatcherService();
+
+  @override
+  void initState() {
+    super.initState();
+    _orderWatcherService.startWatching(); // Start watching order changes
+  }
 
   Widget _buildOrdersListView() {
     return Padding(
@@ -26,7 +35,10 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
               .where((doc) =>
                   doc['orderStatus']['placed'] == true &&
                   doc['orderStatus']['processed'] == false &&
+                  doc['orderStatus']['picked'] == false &&
                   doc['orderStatus']['shipped'] == false &&
+                  doc['orderStatus']['hubNear'] == false &&
+                  doc['orderStatus']['enroute'] == false &&
                   doc['orderStatus']['delivered'] == false)
               .toList();
           if (orders.isEmpty) {

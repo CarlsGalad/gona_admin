@@ -25,8 +25,11 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
             final orders = snapshot.data!.docs
                 .where((doc) =>
                     doc['orderStatus']['placed'] == true &&
-                    doc['orderStatus']['processed'] == true &&
+                    doc['orderStatus']['processed'] == false &&
+                    doc['orderStatus']['picked'] == false &&
                     doc['orderStatus']['shipped'] == false &&
+                    doc['orderStatus']['hubNear'] == false &&
+                    doc['orderStatus']['enroute'] == false &&
                     doc['orderStatus']['delivered'] == false)
                 .toList();
             if (orders.isEmpty) {

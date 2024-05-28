@@ -22,6 +22,12 @@ class _DeliveredCountTitleState extends State<DeliveredCountTitle> {
         await FirebaseFirestore.instance
             .collection('orders')
             .where('orderStatus.delivered', isEqualTo: true)
+            .where('orderStatus.processed', isEqualTo: true)
+            .where('orderStatus.picked', isEqualTo: true)
+            .where('orderStatus.shipped', isEqualTo: true)
+            .where('orderStatus.hubNear', isEqualTo: true)
+            .where('orderStatus.enroute', isEqualTo: true)
+            .where('orderStatus.delivered', isEqualTo: true)
             .get();
     setState(() {
       _deliveredOrdersCount = querySnapshot.size;

@@ -22,6 +22,12 @@ class _PendingOrderTileState extends State<PendingOrderTile> {
         await FirebaseFirestore.instance
             .collection('orders')
             .where('orderStatus.placed', isEqualTo: true)
+            .where('orderStatus.processed', isEqualTo: false)
+            .where('orderStatus.picked', isEqualTo: false)
+            .where('orderStatus.shipped', isEqualTo: false)
+            .where('orderStatus.hubNear', isEqualTo: false)
+            .where('orderStatus.enroute', isEqualTo: false)
+            .where('orderStatus.delivered', isEqualTo: false)
             .get();
     setState(() {
       _pendingOrdersCount = querySnapshot.size;
