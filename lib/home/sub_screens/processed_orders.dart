@@ -25,7 +25,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
             final orders = snapshot.data!.docs
                 .where((doc) =>
                     doc['orderStatus']['placed'] == true &&
-                    doc['orderStatus']['processed'] == false &&
+                    doc['orderStatus']['processed'] == true &&
                     doc['orderStatus']['picked'] == false &&
                     doc['orderStatus']['shipped'] == false &&
                     doc['orderStatus']['hubNear'] == false &&
@@ -42,7 +42,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
               itemBuilder: (context, index) {
                 final order = orders[index];
                 final datePlaced =
-                    (order['precessed_date'] as Timestamp).toDate();
+                    (order['processedDate'] as Timestamp).toDate();
                 final timeAgo = timeago.format(datePlaced, allowFromNow: true);
 
                 return Padding(

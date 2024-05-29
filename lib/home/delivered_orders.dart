@@ -21,7 +21,7 @@ class _DeliveredCountTitleState extends State<DeliveredCountTitle> {
     final QuerySnapshot<Map<String, dynamic>> querySnapshot =
         await FirebaseFirestore.instance
             .collection('orders')
-            .where('orderStatus.delivered', isEqualTo: true)
+            .where('orderStatus.placed', isEqualTo: true)
             .where('orderStatus.processed', isEqualTo: true)
             .where('orderStatus.picked', isEqualTo: true)
             .where('orderStatus.shipped', isEqualTo: true)

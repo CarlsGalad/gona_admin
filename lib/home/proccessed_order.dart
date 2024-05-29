@@ -21,7 +21,7 @@ class _ProcessedCountTileState extends State<ProcessedCountTile> {
     final QuerySnapshot<Map<String, dynamic>> querySnapshot =
         await FirebaseFirestore.instance
             .collection('orders')
-            .where('orderStatus.place', isEqualTo: true)
+            .where('orderStatus.placed', isEqualTo: true)
             .where('orderStatus.processed', isEqualTo: true)
             .where('orderStatus.picked', isEqualTo: false)
             .where('orderStatus.shipped', isEqualTo: false)
