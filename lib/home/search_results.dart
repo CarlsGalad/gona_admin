@@ -1,48 +1,124 @@
 import 'package:flutter/material.dart';
 
-class SearchResultsScreen extends StatelessWidget {
+import '../services/search_services.dart';
+
+class SearchResultsScreen extends StatefulWidget {
   final List<Map<String, dynamic>> searchResults;
   final String? errorMessage;
 
-  const SearchResultsScreen(
-      {super.key, required this.searchResults, this.errorMessage});
+  const SearchResultsScreen({
+    super.key,
+    required this.searchResults,
+    this.errorMessage,
+  });
+
+  @override
+  _SearchResultsScreenState createState() => _SearchResultsScreenState();
+}
+
+class _SearchResultsScreenState extends State<SearchResultsScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  bool _isLoading = false;
+  List<Map<String, dynamic>> _searchResults = [];
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchResults = widget.searchResults;
+    _errorMessage = widget.errorMessage;
+  }
+
+  Future<void> _performSearch(String searchText) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      List<Map<String, dynamic>> results =
+          await SearchService().search(searchText);
+
+      setState(() {
+        _searchResults = results;
+        _isLoading = false;
+      });
+
+      if (results.isEmpty) {
+        setState(() {
+          _errorMessage = 'No results found.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Error occurred during search: $e';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black12,
       appBar: AppBar(
-        title: const Text('Search Results'),
+        title: TextField(
+          controller: _searchController,
+          decoration: const InputDecoration(
+            hintText: 'Search...',
+            border: InputBorder.none,
+            hintStyle: TextStyle(color: Colors.white60),
+          ),
+          style: const TextStyle(color: Colors.white),
+          onSubmitted: (value) {
+            if (value.isNotEmpty) {
+              _performSearch(value);
+            }
+          },
+        ),
+        backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              if (_searchController.text.isNotEmpty) {
+                _performSearch(_searchController.text);
+              }
+            },
+          ),
+        ],
       ),
-      body: searchResults.isEmpty
-          ? Center(
-              child: Text(
-                errorMessage ?? 'No results found.',
-                style: const TextStyle(color: Colors.red, fontSize: 16),
-              ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemCount: searchResults.length,
-              itemBuilder: (context, index) {
-                final result = searchResults[index];
-                final collectionName =
-                    result['collectionName'] ?? 'Unknown Collection';
-                final displayName = result['name'] ??
-                    result['farmName'] ??
-                    result['ownersName'] ??
-                    result['order_id'] ??
-                    result['customer_id'] ??
-                    result['firstName'] ??
-                    result['lastName'] ??
-                    result['email'] ??
-                    '';
-
-                return ListTile(
-                  title: Text(displayName),
-                  subtitle: Text(result.toString()), // Customize this as needed
-                  trailing: Text(collectionName),
-                );
-              },
-            ),
+          : _searchResults.isEmpty
+              ? Center(
+                  child: Text(
+                    _errorMessage ?? 'No results found.',
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _searchResults.length,
+                  itemBuilder: (context, index) {
+                    final result = _searchResults[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        color: Colors.black38,
+                        child: ListTile(
+                          title: Text(result['name'] ??
+                              result['order_id'] ??
+                              result['customer_id'] ??
+                              'Unknown'),
+                          subtitle:
+                              Text('Found in: ${result['collectionName']}'),
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

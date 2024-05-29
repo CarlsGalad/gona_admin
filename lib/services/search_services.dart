@@ -5,6 +5,7 @@ class SearchService {
 
   Future<List<Map<String, dynamic>>> search(String searchText) async {
     List<Map<String, dynamic>> results = [];
+    String lowercasedSearchText = searchText.toLowerCase();
 
     // Helper function to add collection name
     void addResults(QuerySnapshot snapshot, String collectionName) {
@@ -12,82 +13,52 @@ class SearchService {
         var data = doc.data() as Map<String, dynamic>;
         data['collectionName'] = collectionName;
         return data;
+      }).where((data) {
+        return data.values.any((value) =>
+            value is String &&
+            value.toLowerCase().contains(lowercasedSearchText));
       }));
     }
 
     try {
+      // Fetch all documents and filter in Dart
+      Future<void> fetchAndFilter(String collection, String field) async {
+        QuerySnapshot snapshot = await _firestore.collection(collection).get();
+        addResults(snapshot, collection);
+      }
+
+      // Fetch all documents from collection groups and filter in Dart
+      Future<void> fetchAndFilterGroup(
+          String collectionGroup, String field) async {
+        QuerySnapshot snapshot =
+            await _firestore.collectionGroup(collectionGroup).get();
+        addResults(snapshot, collectionGroup);
+      }
+
       // Search in 'Category' collection
-      QuerySnapshot categorySnapshot = await _firestore
-          .collection('Category')
-          .where('name', isEqualTo: searchText)
-          .get();
-      addResults(categorySnapshot, 'Category');
+      await fetchAndFilter('Category', 'name');
 
       // Search in 'Category' sub-collection 'Subcategories'
-      QuerySnapshot subcategorySnapshot = await _firestore
-          .collectionGroup('Subcategories')
-          .where('name', isEqualTo: searchText)
-          .get();
-      addResults(subcategorySnapshot, 'Subcategories');
+      await fetchAndFilterGroup('Subcategories', 'name');
 
       // Search in 'Items' collection
-      QuerySnapshot itemsSnapshot = await _firestore
-          .collection('Items')
-          .where('name', isEqualTo: searchText)
-          .get();
-      addResults(itemsSnapshot, 'Items');
+      await fetchAndFilter('Items', 'name');
 
       // Search in 'farms' collection
-      QuerySnapshot farmsSnapshot = await _firestore
-          .collection('farms')
-          .where('farmName', isEqualTo: searchText)
-          .get();
-      addResults(farmsSnapshot, 'farms');
-
-      QuerySnapshot farmsOwnersSnapshot = await _firestore
-          .collection('farms')
-          .where('ownersName', isEqualTo: searchText)
-          .get();
-      addResults(farmsOwnersSnapshot, 'farms');
+      await fetchAndFilter('farms', 'farmName');
+      await fetchAndFilter('farms', 'ownersName');
 
       // Search in 'orderItems' collection
-      QuerySnapshot orderItemsSnapshot = await _firestore
-          .collection('orderItems')
-          .where('order_id', isEqualTo: searchText)
-          .get();
-      addResults(orderItemsSnapshot, 'orderItems');
+      await fetchAndFilter('orderItems', 'order_id');
 
       // Search in 'orders' collection
-      QuerySnapshot ordersSnapshot = await _firestore
-          .collection('orders')
-          .where('order_id', isEqualTo: searchText)
-          .get();
-      addResults(ordersSnapshot, 'orders');
-
-      QuerySnapshot ordersCustomerSnapshot = await _firestore
-          .collection('orders')
-          .where('customer_id', isEqualTo: searchText)
-          .get();
-      addResults(ordersCustomerSnapshot, 'orders');
+      await fetchAndFilter('orders', 'order_id');
+      await fetchAndFilter('orders', 'customer_id');
 
       // Search in 'users' collection
-      QuerySnapshot usersFirstNameSnapshot = await _firestore
-          .collection('users')
-          .where('firstName', isEqualTo: searchText)
-          .get();
-      addResults(usersFirstNameSnapshot, 'users');
-
-      QuerySnapshot usersLastNameSnapshot = await _firestore
-          .collection('users')
-          .where('lastName', isEqualTo: searchText)
-          .get();
-      addResults(usersLastNameSnapshot, 'users');
-
-      QuerySnapshot usersEmailSnapshot = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: searchText)
-          .get();
-      addResults(usersEmailSnapshot, 'users');
+      await fetchAndFilter('users', 'firstName');
+      await fetchAndFilter('users', 'lastName');
+      await fetchAndFilter('users', 'email');
 
       return results;
     } catch (e) {
