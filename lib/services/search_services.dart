@@ -15,79 +15,85 @@ class SearchService {
       }));
     }
 
-    // Search in 'Category' collection
-    QuerySnapshot categorySnapshot = await _firestore
-        .collection('Category')
-        .where('name', isEqualTo: searchText)
-        .get();
-    addResults(categorySnapshot, 'Category');
+    try {
+      // Search in 'Category' collection
+      QuerySnapshot categorySnapshot = await _firestore
+          .collection('Category')
+          .where('name', isEqualTo: searchText)
+          .get();
+      addResults(categorySnapshot, 'Category');
 
-    // Search in 'Category' sub-collection 'Subcategories'
-    QuerySnapshot subcategorySnapshot = await _firestore
-        .collectionGroup('Subcategories')
-        .where('name', isEqualTo: searchText)
-        .get();
-    addResults(subcategorySnapshot, 'Subcategories');
+      // Search in 'Category' sub-collection 'Subcategories'
+      QuerySnapshot subcategorySnapshot = await _firestore
+          .collectionGroup('Subcategories')
+          .where('name', isEqualTo: searchText)
+          .get();
+      addResults(subcategorySnapshot, 'Subcategories');
 
-    // Search in 'Items' collection
-    QuerySnapshot itemsSnapshot = await _firestore
-        .collection('Items')
-        .where('name', isEqualTo: searchText)
-        .get();
-    addResults(itemsSnapshot, 'Items');
+      // Search in 'Items' collection
+      QuerySnapshot itemsSnapshot = await _firestore
+          .collection('Items')
+          .where('name', isEqualTo: searchText)
+          .get();
+      addResults(itemsSnapshot, 'Items');
 
-    // Search in 'farms' collection
-    QuerySnapshot farmsSnapshot = await _firestore
-        .collection('farms')
-        .where('farmName', isEqualTo: searchText)
-        .get();
-    addResults(farmsSnapshot, 'farms');
+      // Search in 'farms' collection
+      QuerySnapshot farmsSnapshot = await _firestore
+          .collection('farms')
+          .where('farmName', isEqualTo: searchText)
+          .get();
+      addResults(farmsSnapshot, 'farms');
 
-    QuerySnapshot farmsOwnersSnapshot = await _firestore
-        .collection('farms')
-        .where('ownersName', isEqualTo: searchText)
-        .get();
-    addResults(farmsOwnersSnapshot, 'farms');
+      QuerySnapshot farmsOwnersSnapshot = await _firestore
+          .collection('farms')
+          .where('ownersName', isEqualTo: searchText)
+          .get();
+      addResults(farmsOwnersSnapshot, 'farms');
 
-    // Search in 'orderItems' collection
-    QuerySnapshot orderItemsSnapshot = await _firestore
-        .collection('orderItems')
-        .where('order_id', isEqualTo: searchText)
-        .get();
-    addResults(orderItemsSnapshot, 'orderItems');
+      // Search in 'orderItems' collection
+      QuerySnapshot orderItemsSnapshot = await _firestore
+          .collection('orderItems')
+          .where('order_id', isEqualTo: searchText)
+          .get();
+      addResults(orderItemsSnapshot, 'orderItems');
 
-    // Search in 'orders' collection
-    QuerySnapshot ordersSnapshot = await _firestore
-        .collection('orders')
-        .where('order_id', isEqualTo: searchText)
-        .get();
-    addResults(ordersSnapshot, 'orders');
+      // Search in 'orders' collection
+      QuerySnapshot ordersSnapshot = await _firestore
+          .collection('orders')
+          .where('order_id', isEqualTo: searchText)
+          .get();
+      addResults(ordersSnapshot, 'orders');
 
-    QuerySnapshot ordersCustomerSnapshot = await _firestore
-        .collection('orders')
-        .where('customer_id', isEqualTo: searchText)
-        .get();
-    addResults(ordersCustomerSnapshot, 'orders');
+      QuerySnapshot ordersCustomerSnapshot = await _firestore
+          .collection('orders')
+          .where('customer_id', isEqualTo: searchText)
+          .get();
+      addResults(ordersCustomerSnapshot, 'orders');
 
-    // Search in 'users' collection
-    QuerySnapshot usersFirstNameSnapshot = await _firestore
-        .collection('users')
-        .where('firstName', isEqualTo: searchText)
-        .get();
-    addResults(usersFirstNameSnapshot, 'users');
+      // Search in 'users' collection
+      QuerySnapshot usersFirstNameSnapshot = await _firestore
+          .collection('users')
+          .where('firstName', isEqualTo: searchText)
+          .get();
+      addResults(usersFirstNameSnapshot, 'users');
 
-    QuerySnapshot usersLastNameSnapshot = await _firestore
-        .collection('users')
-        .where('lastName', isEqualTo: searchText)
-        .get();
-    addResults(usersLastNameSnapshot, 'users');
+      QuerySnapshot usersLastNameSnapshot = await _firestore
+          .collection('users')
+          .where('lastName', isEqualTo: searchText)
+          .get();
+      addResults(usersLastNameSnapshot, 'users');
 
-    QuerySnapshot usersEmailSnapshot = await _firestore
-        .collection('users')
-        .where('email', isEqualTo: searchText)
-        .get();
-    addResults(usersEmailSnapshot, 'users');
+      QuerySnapshot usersEmailSnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: searchText)
+          .get();
+      addResults(usersEmailSnapshot, 'users');
 
-    return results;
+      return results;
+    } catch (e) {
+      // Log the error or handle it appropriately
+      print('Error occurred during search: $e');
+      return [];
+    }
   }
 }

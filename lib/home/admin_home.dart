@@ -8,8 +8,10 @@ import '../disputes/disputes.dart';
 import '../marketing/marketing.dart';
 import '../news/gonanews.dart';
 import '../help/live_chat.dart';
+import '../services/search_services.dart';
 import '../user/users.dart';
 import '../vendors/vendors.dart';
+import 'search_results.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -20,7 +22,52 @@ class AdminHome extends StatefulWidget {
 
 class _AdminHomeState extends State<AdminHome> {
   final _searchBarController = TextEditingController();
+  final SearchService _searchService = SearchService();
   int _selectedIndex = 0;
+
+  void _onSearch() async {
+    String searchText = _searchBarController.text;
+    if (searchText.isNotEmpty) {
+      // Show the loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      try {
+        List<Map<String, dynamic>> results =
+            await _searchService.search(searchText);
+        Navigator.pop(context); // Remove the loading indicator
+
+        if (results.isEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchResultsScreen(
+                  searchResults: results, errorMessage: 'No results found.'),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchResultsScreen(searchResults: results),
+            ),
+          );
+        }
+      } catch (e) {
+        Navigator.pop(context); // Remove the loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('An error occurred during the search.')));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Search text cannot be empty.')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +144,7 @@ class _AdminHomeState extends State<AdminHome> {
         actions: [
           SearchBar(
             backgroundColor:
-                MaterialStateColor.resolveWith((states) => Colors.black26),
+                WidgetStateColor.resolveWith((states) => Colors.black26),
             textCapitalization: TextCapitalization.sentences,
             constraints: const BoxConstraints(
                 maxHeight: 40, maxWidth: 300, minHeight: 40, minWidth: 250),
@@ -111,11 +158,12 @@ class _AdminHomeState extends State<AdminHome> {
               )
             ],
             controller: _searchBarController,
-            textStyle: MaterialStateProperty.resolveWith(
+            textStyle: WidgetStateProperty.resolveWith(
                 (states) => const TextStyle(color: Colors.white)),
             hintText: 'Search ',
-            hintStyle: MaterialStateProperty.resolveWith(
+            hintStyle: WidgetStateProperty.resolveWith(
                 (states) => const TextStyle(color: Colors.grey)),
+            onSubmitted: (_) => _onSearch(),
           ),
           const SizedBox(
             width: 200,

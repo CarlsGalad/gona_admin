@@ -10,7 +10,7 @@ import 'watcher.dart';
 
 void main() async {
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+    options: DefaultFirebaseOptions.web,
   );
 
   // Create an instance of the OrderWatcherService
