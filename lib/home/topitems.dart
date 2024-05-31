@@ -76,52 +76,49 @@ class _TopItemsState extends State<TopItems> {
                 // List
                 SizedBox(
                   height: 600,
-                  child: Expanded(
-                    child: FutureBuilder<List<Map<String, dynamic>>>(
-                      future: _fetchTopItems(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
-                        if (snapshot.data!.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              'No top items available',
-                              style: TextStyle(color: Colors.white),
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _fetchTopItems(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No top items available',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+
+                      final topItemsData = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: topItemsData.length,
+                        itemBuilder: (context, index) {
+                          final item = topItemsData[index];
+                          return ListTile(
+                            title: Text(
+                              item['itemName'],
+                              style: const TextStyle(
+                                  color: Colors.blueGrey, fontSize: 13),
+                              softWrap: false,
+                            ),
+                            subtitle: Text(
+                              'Quantity Sold: ${item['quantitySold']}',
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 10),
+                              softWrap: false,
+                            ),
+                            trailing: Text(
+                              'Vendor: ${item['vendorName']}',
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 10),
+                              softWrap: false,
                             ),
                           );
-                        }
-
-                        final topItemsData = snapshot.data!;
-                        return ListView.builder(
-                          itemCount: topItemsData.length,
-                          itemBuilder: (context, index) {
-                            final item = topItemsData[index];
-                            return ListTile(
-                              title: Text(
-                                item['itemName'],
-                                style: const TextStyle(
-                                    color: Colors.blueGrey, fontSize: 13),
-                                softWrap: false,
-                              ),
-                              subtitle: Text(
-                                'Quantity Sold: ${item['quantitySold']}',
-                                style: const TextStyle(
-                                    color: Colors.grey, fontSize: 10),
-                                softWrap: false,
-                              ),
-                              trailing: Text(
-                                'Vendor: ${item['vendorName']}',
-                                style: const TextStyle(
-                                    color: Colors.grey, fontSize: 10),
-                                softWrap: false,
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                        },
+                      );
+                    },
                   ),
                 ),
               ],

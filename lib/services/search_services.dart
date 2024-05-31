@@ -12,6 +12,7 @@ class SearchService {
       results.addAll(snapshot.docs.map((doc) {
         var data = doc.data() as Map<String, dynamic>;
         data['collectionName'] = collectionName;
+        data['docId'] = doc.id;
         return data;
       }).where((data) {
         return data.values.any((value) =>

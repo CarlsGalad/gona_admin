@@ -60,8 +60,8 @@ class _AdminHomeState extends State<AdminHome> {
         }
       } catch (e) {
         Navigator.pop(context); // Remove the loading indicator
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('An error occurred during the search.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('An error occurred during the search.')));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,7 +197,6 @@ class _AdminHomeState extends State<AdminHome> {
       body: Row(
         children: [
           Expanded(
-            // Wrap the row with Expanded
             child: Row(
               children: <Widget>[
                 LayoutBuilder(builder: (context, constraint) {

@@ -62,7 +62,15 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
   void _showDetailDialog(BuildContext context, Map<String, dynamic> result) {
     String collectionName = result['collectionName'];
+    String? docId = result['docId'];
+    if (docId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Document ID is missing.')),
+      );
+      return;
+    }
     Widget content;
+    bool isUpdating = false;
 
     switch (collectionName) {
       case 'Category':
@@ -98,71 +106,90 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
             TextEditingController(text: result['description']);
         TextEditingController priceController =
             TextEditingController(text: result['price'].toString());
-        content = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ImageNetwork(
-              image: result['itemPath'],
-              height: 150,
-              width: 150,
-              curve: Curves.bounceIn,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            const Divider(),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                  labelText: 'Name', labelStyle: GoogleFonts.roboto()),
-            ),
-            TextField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                  labelText: 'Description', labelStyle: GoogleFonts.roboto()),
-            ),
-            TextField(
-              controller: priceController,
-              decoration: InputDecoration(
-                  labelText: 'Price', labelStyle: GoogleFonts.roboto()),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Farm: ${result['itemFarm']}',
-              style: GoogleFonts.roboto(),
-            ),
-            const Divider(),
-            Text(
-              'Selling Method: ${result['sellingMethod']}',
-              style: GoogleFonts.roboto(),
-            ),
-            const Divider(),
-            Text(
-              'In Stock: ${result['availQuantity']}',
-              style: GoogleFonts.roboto(),
-            ),
-            const Divider(),
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  await _updateItem(
-                    result['docId'],
-                    nameController.text,
-                    descriptionController.text,
-                    double.parse(priceController.text),
-                  );
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Save',
-                  style: GoogleFonts.roboto(),
-                ),
+
+        content = StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ImageNetwork(
+                image: result['itemPath'],
+                height: 150,
+                width: 150,
+                curve: Curves.bounceIn,
+                borderRadius: BorderRadius.circular(10),
               ),
-            ),
-          ],
-        );
+              const Divider(),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                    labelText: 'Name', labelStyle: GoogleFonts.roboto()),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: InputDecoration(
+                    labelText: 'Description', labelStyle: GoogleFonts.roboto()),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: InputDecoration(
+                    labelText: 'Price', labelStyle: GoogleFonts.roboto()),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Farm: ${result['itemFarm']}',
+                style: GoogleFonts.roboto(),
+              ),
+              const Divider(),
+              Text(
+                'Selling Method: ${result['sellingMethod']}',
+                style: GoogleFonts.roboto(),
+              ),
+              const Divider(),
+              Text(
+                'In Stock: ${result['availQuantity']}',
+                style: GoogleFonts.roboto(),
+              ),
+              const Divider(),
+              const SizedBox(height: 20),
+              isUpdating
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: () async {
+                        setState(() {
+                          isUpdating = true;
+                        });
+                        try {
+                          double parsedPrice =
+                              double.parse(priceController.text);
+                          await _updateItem(
+                            result['docId'],
+                            nameController.text,
+                            descriptionController.text,
+                            parsedPrice,
+                          );
+                          setState(() {
+                            isUpdating = false;
+                          });
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          setState(() {
+                            isUpdating = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error: $e')),
+                          );
+                        }
+                      },
+                      child: const Text('Save'),
+                    ),
+            ],
+          );
+        });
         break;
       case 'farms':
         content = Column(
@@ -383,7 +410,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           .doc(docId)
           .update({'name': name, 'description': description, 'price': price});
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Item updated successfully')),
+        const SnackBar(content: const Text('Item updated successfully')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
