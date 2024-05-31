@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:gona_admin/home/home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../categories/category.dart';
 import '../disputes/disputes.dart';
@@ -8,6 +10,7 @@ import '../disputes/disputes.dart';
 import '../marketing/marketing.dart';
 import '../news/gonanews.dart';
 import '../help/live_chat.dart';
+import '../services/admin_service.dart';
 import '../services/search_services.dart';
 import '../user/users.dart';
 import '../vendors/vendors.dart';
@@ -24,6 +27,34 @@ class _AdminHomeState extends State<AdminHome> {
   final _searchBarController = TextEditingController();
   final SearchService _searchService = SearchService();
   int _selectedIndex = 0;
+  String? adminId;
+  Map<String, dynamic>? adminData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCurrentUser();
+  }
+
+  Future<void> _fetchCurrentUser() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        adminId = user.uid;
+      });
+      _fetchAdminData(user.uid);
+    }
+  }
+
+  Future<void> _fetchAdminData(String adminId) async {
+    AdminService adminService = AdminService();
+    var data = await adminService.getCurrentAdminData(adminId);
+    setState(() {
+      adminData = data;
+      isLoading = false;
+    });
+  }
 
   void _onSearch() async {
     String searchText = _searchBarController.text;
@@ -142,6 +173,7 @@ class _AdminHomeState extends State<AdminHome> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.black54,
         actions: [
+          // search bar starts here
           SearchBar(
             backgroundColor:
                 WidgetStateColor.resolveWith((states) => Colors.black26),
@@ -182,16 +214,118 @@ class _AdminHomeState extends State<AdminHome> {
                 onPressed: () {},
                 icon: const Icon(Icons.notifications_none)),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 30.0, left: 4),
-            child: IconButton(
-              color: Colors.grey,
-              onPressed: () {},
-              icon: const Icon(
-                Icons.account_box,
-              ),
-            ),
-          )
+          isLoading
+              ? const LinearProgressIndicator()
+              : Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: PopupMenuButton(
+                    elevation: 5,
+                    icon: adminData != null && adminData!['imagePath'] != null
+                        ? CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(adminData!['imagePath']),
+                          )
+                        : const Icon(Icons.account_box_rounded),
+                    iconColor: Colors.white54,
+                    color: Colors.white70,
+                    position: PopupMenuPosition.under,
+                    popUpAnimationStyle: AnimationStyle(curve: Curves.easeIn),
+                    itemBuilder: (BuildContext context) {
+                      return [
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 15.0, left: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${adminData!['firstName']} ${adminData!['lastName']} ',
+                                        style: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        '${adminData!['email']}',
+                                        style: GoogleFonts.roboto(fontSize: 12),
+                                      ),
+                                      adminData!['role'] != null
+                                          ? Text(
+                                              '${adminData!['role'] ?? ''}',
+                                              style: GoogleFonts.roboto(),
+                                            )
+                                          : const Text(''),
+                                      adminData!['department'] != null
+                                          ? Text(
+                                              '${adminData!['department'] ?? ''}',
+                                              style: GoogleFonts.roboto())
+                                          : const Text(''),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const VerticalDivider(
+                                color: Colors.black,
+                                width: 5,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  children: [
+                                    adminData!['imagePath'] != null
+                                        ? CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                adminData!['imagePath']),
+                                            radius: 30,
+                                          )
+                                        : Container(
+                                            height: 60,
+                                            width: 60,
+                                            decoration: const BoxDecoration(
+                                                color: Color.fromARGB(
+                                                    255, 100, 99, 99),
+                                                shape: BoxShape.circle),
+                                            child: const Icon(
+                                                Icons.account_box_rounded,
+                                                size: 60),
+                                          ),
+                                    const SizedBox(height: 10),
+                                    InkWell(
+                                      onTap: _logout,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey,
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 16.0,
+                                              top: 6,
+                                              bottom: 6,
+                                              right: 16),
+                                          child: Text(
+                                            'Logout',
+                                            style: GoogleFonts.abel(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ];
+                    },
+                  ),
+                ),
         ],
       ),
       body: Row(
@@ -275,5 +409,10 @@ class _AdminHomeState extends State<AdminHome> {
         ],
       ),
     );
+  }
+
+  void _logout() {
+    FirebaseAuth.instance.signOut();
+    // Navigate to login screen or any other action after logout
   }
 }
