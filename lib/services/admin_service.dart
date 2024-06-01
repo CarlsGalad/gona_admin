@@ -21,4 +21,26 @@ class AdminService {
       'imagePath': imageUrl,
     });
   }
+
+
+  Stream<QuerySnapshot> listenToOrders() {
+    return _firestore.collection('orders').snapshots();
+  }
+
+  Stream<QuerySnapshot> listenToOrderItems() {
+    return _firestore.collection('orderItems').snapshots();
+  }
+
+  Stream<QuerySnapshot> listenToNews() {
+    return _firestore.collection('news').snapshots();
+  }
+
+  Stream<QuerySnapshot> listenToItems() {
+    return _firestore.collection('Items').snapshots();
+  }
+
+  Future<Map<String, dynamic>?> getFarmData(String farmId) async {
+    DocumentSnapshot snapshot = await _firestore.collection('farms').doc(farmId).get();
+    return snapshot.data() as Map<String, dynamic>?;
+  }
 }
