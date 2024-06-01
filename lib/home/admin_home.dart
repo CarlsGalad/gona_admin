@@ -16,6 +16,7 @@ import '../marketing/marketing.dart';
 import '../news/gonanews.dart';
 import '../help/live_chat.dart';
 import '../services/admin_service.dart';
+import '../services/nofication_service.dart';
 import '../services/search_services.dart';
 import '../user/users.dart';
 import '../vendors/vendors.dart';
@@ -35,6 +36,8 @@ class _AdminHomeState extends State<AdminHome> {
   String? adminId;
   Map<String, dynamic>? adminData;
   bool isLoading = true;
+  List<String> notifications = [];
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -59,6 +62,10 @@ class _AdminHomeState extends State<AdminHome> {
       adminData = data;
       isLoading = false;
     });
+    if (data != null) {
+      _notificationService.setupListeners(
+          data['role'] ?? '', data['department'] ?? '');
+    }
   }
 
   void _onSearch() async {
@@ -239,13 +246,74 @@ class _AdminHomeState extends State<AdminHome> {
                 onPressed: () {},
                 icon: const Icon(Icons.history)),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0, left: 8),
-            child: IconButton(
-                color: Colors.grey,
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_none)),
+          StreamBuilder<List<String>>(
+            stream: _notificationService.notificationsStream,
+            builder: (context, snapshot) {
+              int notificationCount =
+                  snapshot.hasData ? snapshot.data!.length : 0;
+              return Stack(
+                children: [
+                  PopupMenuButton(
+                    iconColor: Colors.white54,
+                    icon: const Icon(Icons.notifications),
+                    itemBuilder: (BuildContext context) {
+                      if (notificationCount == 0) {
+                        return [
+                          PopupMenuItem(
+                            child: SizedBox(
+                                width: 250,
+                                height: 650,
+                                child: Center(
+                                    child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.face_retouching_natural),
+                                    Text(
+                                      'You have no notifications',
+                                      style: GoogleFonts.abel(),
+                                    ),
+                                  ],
+                                ))),
+                          ),
+                        ];
+                      } else {
+                        return snapshot.data!.map((String notification) {
+                          return PopupMenuItem(
+                            child: SelectableText(notification),
+                          );
+                        }).toList();
+                      }
+                    },
+                  ),
+                  if (notificationCount > 0)
+                    Positioned(
+                      right: 11,
+                      top: 11,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Text(
+                          '$notificationCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
+
           isLoading
               ? const CircularProgressIndicator()
               : Padding(
@@ -265,7 +333,6 @@ class _AdminHomeState extends State<AdminHome> {
                               width: 25,
                               height: 25,
                             ),
-                          
                           )
                         : const Icon(Icons.account_box_rounded),
                     iconColor: Colors.white54,

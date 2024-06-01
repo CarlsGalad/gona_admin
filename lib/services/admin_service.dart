@@ -22,7 +22,6 @@ class AdminService {
     });
   }
 
-
   Stream<QuerySnapshot> listenToOrders() {
     return _firestore.collection('orders').snapshots();
   }
@@ -39,8 +38,13 @@ class AdminService {
     return _firestore.collection('Items').snapshots();
   }
 
+  Stream<QuerySnapshot> listenToDisputes() {
+    return _firestore.collection('disputes').snapshots();
+  }
+
   Future<Map<String, dynamic>?> getFarmData(String farmId) async {
-    DocumentSnapshot snapshot = await _firestore.collection('farms').doc(farmId).get();
+    DocumentSnapshot snapshot =
+        await _firestore.collection('farms').doc(farmId).get();
     return snapshot.data() as Map<String, dynamic>?;
   }
 }
