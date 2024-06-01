@@ -1,8 +1,13 @@
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:gona_admin/home/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_network/image_network.dart';
 
 import '../categories/category.dart';
 import '../disputes/disputes.dart';
@@ -97,6 +102,33 @@ class _AdminHomeState extends State<AdminHome> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Search text cannot be empty.')));
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(type: FileType.image);
+
+    if (result != null) {
+      Uint8List? fileBytes = result.files.first.bytes;
+      if (fileBytes != null) {
+        // Upload the image to Firebase Storage
+        Reference ref = FirebaseStorage.instance
+            .ref()
+            .child('admin_images/${adminId}_profile.jpg');
+
+        UploadTask uploadTask = ref.putData(fileBytes);
+        TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+        // Get the image URL and update the admin data
+        String imageUrl = await snapshot.ref.getDownloadURL();
+        await AdminService().updateAdminImage(adminId!, imageUrl);
+
+        // Show a snackbar or toast message to indicate success
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Profile image updated successfully'),
+        ));
+      }
     }
   }
 
@@ -215,15 +247,24 @@ class _AdminHomeState extends State<AdminHome> {
                 icon: const Icon(Icons.notifications_none)),
           ),
           isLoading
-              ? const LinearProgressIndicator()
+              ? const CircularProgressIndicator()
               : Padding(
                   padding: const EdgeInsets.only(right: 20.0),
                   child: PopupMenuButton(
                     elevation: 5,
+                    iconSize: 25,
+                    splashRadius: 30,
                     icon: adminData != null && adminData!['imagePath'] != null
-                        ? CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(adminData!['imagePath']),
+                        ? Container(
+                            width: 25,
+                            height: 25,
+                            decoration:
+                                const BoxDecoration(shape: BoxShape.circle),
+                            child: ImageNetwork(
+                              image: adminData!['imagePath'],
+                              width: 25,
+                              height: 25,
+                            ),
                           )
                         : const Icon(Icons.account_box_rounded),
                     iconColor: Colors.white54,
@@ -276,23 +317,54 @@ class _AdminHomeState extends State<AdminHome> {
                                 flex: 1,
                                 child: Column(
                                   children: [
-                                    adminData!['imagePath'] != null
-                                        ? CircleAvatar(
-                                            backgroundImage: NetworkImage(
-                                                adminData!['imagePath']),
-                                            radius: 30,
-                                          )
-                                        : Container(
-                                            height: 60,
-                                            width: 60,
-                                            decoration: const BoxDecoration(
-                                                color: Color.fromARGB(
-                                                    255, 100, 99, 99),
-                                                shape: BoxShape.circle),
-                                            child: const Icon(
-                                                Icons.account_box_rounded,
-                                                size: 60),
+                                    Padding(
+                                      padding: const EdgeInsets.all(14.0),
+                                      child: Stack(children: [
+                                        adminData!['imagePath'] != null
+                                            ? Container(
+                                                height: 80,
+                                                width: 80,
+                                                decoration: const BoxDecoration(
+                                                    color: Colors.grey,
+                                                    shape: BoxShape.circle),
+                                                child: ImageNetwork(
+                                                  image:
+                                                      adminData!['imagePath'],
+                                                  width: 60,
+                                                  height: 60,
+                                                ),
+                                              )
+                                            : Container(
+                                                height: 80,
+                                                width: 80,
+                                                decoration: const BoxDecoration(
+                                                    color: Colors.grey,
+                                                    shape: BoxShape.circle),
+                                                child: const Icon(Icons.person,
+                                                    size: 60),
+                                              ),
+                                        Positioned(
+                                          right: 0,
+                                          bottom: 0,
+                                          child: InkWell(
+                                            onTap: _uploadImage,
+                                            child: Container(
+                                              width: 30,
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.black,
+                                                  border: Border.all(
+                                                      color: Colors.white)),
+                                              child: const Icon(
+                                                Icons.edit,
+                                                color: Colors.grey,
+                                                size: 15,
+                                              ),
+                                            ),
                                           ),
+                                        ),
+                                      ]),
+                                    ),
                                     const SizedBox(height: 10),
                                     InkWell(
                                       onTap: _logout,

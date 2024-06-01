@@ -41,7 +41,7 @@ class CreateNewsState extends State<CreateNews> {
     final User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       // Handle the case where the user is not signed in
-      print('No user signed in');
+
       return;
     }
 

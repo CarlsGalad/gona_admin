@@ -15,4 +15,10 @@ class AdminService {
     }
     return null;
   }
+
+  Future<void> updateAdminImage(String adminId, String imageUrl) async {
+    await _firestore.collection('admin').doc(adminId).set({
+      'imagePath': imageUrl,
+    });
+  }
 }
