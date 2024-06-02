@@ -16,6 +16,9 @@ class TransactionsScreenState extends State<TransactionsScreen> {
   DateTime? _selectedDate;
   final TextEditingController _searchController = TextEditingController();
   String _searchText = '';
+  Map<String, double> _transactionSums = {};
+  double _positiveTotal = 0.0;
+  double _outgoingTotal = 0.0;
 
   Stream<QuerySnapshot> _getTransactionsStream(
       DateTime? selectedDate, String searchText) {
@@ -38,6 +41,29 @@ class TransactionsScreenState extends State<TransactionsScreen> {
     }
 
     return query.snapshots();
+  }
+
+  void _calculateTransactionSums(QuerySnapshot snapshot) {
+    _transactionSums = {};
+    _positiveTotal = 0.0;
+    _outgoingTotal = 0.0;
+
+    for (var doc in snapshot.docs) {
+      String type = doc['transactionType'] ?? 'Unknown';
+      double amount = doc['amount'] ?? 0.0;
+
+      if (_transactionSums.containsKey(type)) {
+        _transactionSums[type] = _transactionSums[type]! + amount;
+      } else {
+        _transactionSums[type] = amount;
+      }
+
+      if (type == 'sales' || type == 'revenue') {
+        _positiveTotal += amount;
+      } else {
+        _outgoingTotal += amount;
+      }
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -106,121 +132,209 @@ class TransactionsScreenState extends State<TransactionsScreen> {
           ),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _getTransactionsStream(_selectedDate, _searchText),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _getTransactionsStream(_selectedDate, _searchText),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-                child: Text(
-              'No transactions found.',
-              style: GoogleFonts.abel(),
-            ));
-          }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(
+                      child: Text(
+                    'No transactions found.',
+                    style: GoogleFonts.abel(),
+                  ));
+                }
 
-          List<DocumentSnapshot> transactions = snapshot.data!.docs;
+                List<DocumentSnapshot> transactions = snapshot.data!.docs;
+                _calculateTransactionSums(snapshot.data!);
 
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: <DataColumn>[
-                DataColumn(
-                    label: Text(
-                  'Index',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Transaction Type',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Transaction Id',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Amount',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Transaction Date',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Time',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Description',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                )),
-              ],
-              rows: transactions.asMap().entries.map((entry) {
-                int index = entry.key;
-                DocumentSnapshot transaction = entry.value;
-                Timestamp timestamp = transaction['transactionDate'];
-                DateTime dateTime = timestamp.toDate();
-                String formattedDate =
-                    DateFormat('yyyy-MM-dd').format(dateTime);
-                String formattedTime = DateFormat('kk:mm').format(dateTime);
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: <DataColumn>[
+                      DataColumn(
+                          label: Text(
+                        'Index',
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Transaction Type',
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Transaction Id',
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Amount',
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Transaction Date',
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Time',
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Description',
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                      )),
+                    ],
+                    rows: transactions.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      DocumentSnapshot transaction = entry.value;
+                      Timestamp timestamp = transaction['transactionDate'];
+                      DateTime dateTime = timestamp.toDate();
+                      String formattedDate =
+                          DateFormat('yyyy-MM-dd').format(dateTime);
+                      String formattedTime =
+                          DateFormat('kk:mm').format(dateTime);
 
-                String transactionType =
-                    transaction['transactionType'] ?? 'N/A';
-                double amount = transaction['amount'];
-                bool isPositiveTransaction =
-                    transactionType == 'sales' || transactionType == 'revenue';
-                IconData iconData = isPositiveTransaction
-                    ? Icons.arrow_upward
-                    : Icons.arrow_downward;
-                Color iconColor =
-                    isPositiveTransaction ? Colors.green : Colors.red;
+                      String transactionType =
+                          transaction['transactionType'] ?? 'N/A';
+                      double amount = transaction['amount'];
+                      bool isPositiveTransaction = transactionType == 'sales' ||
+                          transactionType == 'revenue';
+                      IconData iconData = isPositiveTransaction
+                          ? Icons.arrow_upward
+                          : Icons.arrow_downward;
+                      Color iconColor =
+                          isPositiveTransaction ? Colors.green : Colors.red;
 
-                return DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text((index + 1).toString())),
-                    DataCell(Text(
-                      transactionType,
-                      style: GoogleFonts.roboto(),
-                    )),
-                    DataCell(Text(
-                      transaction['transactionId'] ?? 'N/A',
-                      style: GoogleFonts.roboto(),
-                    )),
-                    DataCell(Row(
-                      children: [
-                        Text(
-                          amount.toString(),
-                          style: GoogleFonts.roboto(),
-                        ),
-                        Icon(iconData, color: iconColor),
-                      ],
-                    )),
-                    DataCell(Text(
-                      formattedDate,
-                      style: GoogleFonts.roboto(),
-                    )),
-                    DataCell(Text(
-                      formattedTime,
-                      style: GoogleFonts.roboto(),
-                    )),
-                    DataCell(Text(
-                      transaction['description'] ?? 'N/A',
-                      style: GoogleFonts.roboto(),
-                    )),
-                  ],
+                      return DataRow(
+                        cells: <DataCell>[
+                          DataCell(Text((index + 1).toString())),
+                          DataCell(Text(
+                            transactionType,
+                            style: GoogleFonts.roboto(),
+                          )),
+                          DataCell(Text(
+                            transaction['transactionId'] ?? 'N/A',
+                            style: GoogleFonts.roboto(),
+                          )),
+                          DataCell(Row(
+                            children: [
+                              Text(
+                                amount.toString(),
+                                style: GoogleFonts.roboto(),
+                              ),
+                              Icon(iconData, color: iconColor),
+                            ],
+                          )),
+                          DataCell(Text(
+                            formattedDate,
+                            style: GoogleFonts.roboto(),
+                          )),
+                          DataCell(Text(
+                            formattedTime,
+                            style: GoogleFonts.roboto(),
+                          )),
+                          DataCell(Text(
+                            transaction['description'] ?? 'N/A',
+                            style: GoogleFonts.roboto(),
+                          )),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 );
-              }).toList(),
+              },
             ),
-          );
-        },
+          ),
+          const VerticalDivider(),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Summary (Last 3 months)',
+                    style: GoogleFonts.aboreto(fontWeight: FontWeight.bold),
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: ListView(
+                      children: _transactionSums.entries.map((entry) {
+                        return ListTile(
+                          title: Text(entry.key),
+                          trailing: Text(entry.value.toStringAsFixed(2)),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const Divider(),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.black54)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Total Incoming Transactions:',
+                              style: GoogleFonts.roboto(
+                                  fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              '\$${_positiveTotal.toStringAsFixed(2)}',
+                              style: GoogleFonts.aboreto(color: Colors.green),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 6,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Total Outgoing Transactions:',
+                              style: GoogleFonts.roboto(
+                                  fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              '\$${_outgoingTotal.toStringAsFixed(2)}',
+                              style: GoogleFonts.aboreto(color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
