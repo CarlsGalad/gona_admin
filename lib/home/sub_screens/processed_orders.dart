@@ -159,7 +159,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white24,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
           'Processed Orders',
@@ -184,28 +184,30 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width - 160,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.blueGrey,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: _buildOrdersListView(),
-              ),
-              const VerticalDivider(
-                width: 1,
-                color: Colors.white24,
-              ),
-              Expanded(
-                flex: 3,
-                child: _buildOrderDetailsView(_selectedOrder),
-              ),
-            ],
+        child: Center(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width - 160,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.blueGrey,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: _buildOrdersListView(),
+                ),
+                const VerticalDivider(
+                  width: 1,
+                  color: Colors.white24,
+                ),
+                Expanded(
+                  flex: 3,
+                  child: _buildOrderDetailsView(_selectedOrder),
+                ),
+              ],
+            ),
           ),
         ),
       ),

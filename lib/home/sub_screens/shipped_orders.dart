@@ -16,7 +16,7 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white38,
+        backgroundColor: Colors.black,
         appBar: AppBar(
           title: const Text(
             'Shipped Orders',
@@ -41,26 +41,28 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
         ),
         body: Padding(
             padding: const EdgeInsets.all(10.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width - 160,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.blueGrey),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: _buildOrdersListView(),
-                  ),
-                  const VerticalDivider(
-                    width: 1,
-                    color: Colors.white24,
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: _buildOrderDetailsView(_selectedOrder),
-                  ),
-                ],
+            child: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width - 160,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.blueGrey),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: _buildOrdersListView(),
+                    ),
+                    const VerticalDivider(
+                      width: 1,
+                      color: Colors.white24,
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: _buildOrderDetailsView(_selectedOrder),
+                    ),
+                  ],
+                ),
               ),
             )));
   }
