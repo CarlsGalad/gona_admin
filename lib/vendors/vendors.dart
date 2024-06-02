@@ -40,7 +40,6 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
 
   Future<void> _deleteVendor(int index) async {
     final vendor = _vendors[index];
-
     final imageUrl = vendor['imagePath'] as String?;
 
     // Delete the image from Firebase Storage if it exists
@@ -128,6 +127,8 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
           final vendor = _vendors[index];
           final farmName = vendor['farmName'] ?? 'Farm Name';
           final ownersName = vendor['ownersName'] ?? 'Owner\'s Name';
+          final status = vendor['status'] ?? 'active';
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
             child: Container(
@@ -142,14 +143,20 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
                   _fetchVendorItems(vendor['userId']);
                 },
                 trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: Icon(
+                    status == 'suspended' ? Icons.lock_open : Icons.block,
+                    color: status == 'suspended' ? Colors.green : Colors.orange,
+                  ),
                   onPressed: () async {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('Delete Vendor'),
-                        content: const Text(
-                            'Are you sure you want to delete this vendor?'),
+                        title: Text(status == 'suspended'
+                            ? 'Lift Suspension'
+                            : 'Suspend Vendor'),
+                        content: Text(status == 'suspended'
+                            ? 'Are you sure you want to lift the suspension on this vendor?'
+                            : 'Are you sure you want to suspend this vendor?'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
@@ -157,13 +164,15 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
                           ),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('Delete'),
+                            child: Text(status == 'suspended'
+                                ? 'Lift Suspension'
+                                : 'Suspend'),
                           ),
                         ],
                       ),
                     );
                     if (confirm == true) {
-                      _deleteVendor(index);
+                      _toggleVendorSuspension(index);
                     }
                   },
                 ),
@@ -347,6 +356,33 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
           ),
         );
       },
+    );
+  }
+
+  void _toggleVendorSuspension(int index) async {
+    final vendor = _vendors[index];
+
+    final vendorId = vendor.id;
+    final currentStatus = vendor['status'] ?? 'active';
+    final newStatus = currentStatus == 'suspended' ? 'active' : 'suspended';
+
+    FirebaseFirestore.instance
+        .collection('farms')
+        .doc(vendorId)
+        .update({'status': newStatus});
+
+    final updatedVendor = await vendor.reference.get();
+
+    setState(() {
+      _vendors[index] = updatedVendor;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(newStatus == 'suspended'
+            ? 'Vendor suspended'
+            : 'lifted suspension'),
+      ),
     );
   }
 }
