@@ -445,6 +445,8 @@ class _AdminHomeState extends State<AdminHome> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                             color: Colors.grey,
+                                            border: Border.all(
+                                                color: Colors.black38),
                                             borderRadius:
                                                 BorderRadius.circular(10)),
                                         child: Padding(
