@@ -40,30 +40,32 @@ class OurUsersScreenState extends State<OurUsersScreen> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width - 180,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10), color: Colors.blueGrey),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: _buildUsersListView(),
-            ),
-            const VerticalDivider(
-              thickness: 1,
-              width: 2,
-              color: Color.fromARGB(255, 26, 25, 25),
-            ),
-            Expanded(
-              flex: 3,
-              child: _selectedUserIndex == null
-                  ? const Center(
-                      child: Text('Please select a user'),
-                    )
-                  : _buildUserDetailsView(),
-            ),
-          ],
+      child: Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width - 155,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10), color: Colors.blueGrey),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: _buildUsersListView(),
+              ),
+              const VerticalDivider(
+                thickness: 1,
+                width: 2,
+                color: Color.fromARGB(255, 26, 25, 25),
+              ),
+              Expanded(
+                flex: 3,
+                child: _selectedUserIndex == null
+                    ? const Center(
+                        child: Text('Please select a user'),
+                      )
+                    : _buildUserDetailsView(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -78,6 +80,8 @@ class OurUsersScreenState extends State<OurUsersScreen> {
           final user = _users[index];
           final firstName = user['firstName'] ?? 'First Name';
           final lastName = user['lastName'] ?? 'Last Name';
+          final status = user['status'] ?? 'active';
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
             child: Container(
@@ -89,31 +93,76 @@ class OurUsersScreenState extends State<OurUsersScreen> {
                     _selectedUserIndex = index;
                   });
                 },
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Delete User'),
-                        content: const Text(
-                            'Are you sure you want to delete this user?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('Delete'),
-                          ),
-                        ],
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        status == 'suspended' ? Icons.lock_open : Icons.block,
+                        color: status == 'suspended'
+                            ? Colors.green
+                            : Colors.orange,
                       ),
-                    );
-                    if (confirm == true) {
-                      _deleteUser(index);
-                    }
-                  },
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(status == 'suspended'
+                                ? 'Lift Suspension'
+                                : 'Suspend User'),
+                            content: Text(status == 'suspended'
+                                ? 'Are you sure you want to lift the suspension on this user?'
+                                : 'Are you sure you want to suspend this user?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: Text(status == 'suspended'
+                                    ? 'Lift Suspension'
+                                    : 'Suspend'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          _toggleUserSuspension(index);
+                        }
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete User'),
+                            content: const Text(
+                                'Are you sure you want to delete this user?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          _deleteUser(index);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -205,6 +254,36 @@ class OurUsersScreenState extends State<OurUsersScreen> {
           ),
         );
       }).toList(),
+    );
+  }
+
+  void _toggleUserSuspension(int index) async {
+    final user = _users[index];
+    final userId = user.id;
+    final currentStatus = user['status'] ?? 'active';
+    final newStatus = currentStatus == 'suspended' ? 'active' : 'suspended';
+
+    // Update the user's status in Firestore
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .update({'status': newStatus});
+
+    // Fetch the updated user data
+    final updatedUser = await user.reference.get();
+
+    setState(() {
+      _users[index] = updatedUser;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          newStatus == 'suspended'
+              ? 'User suspended'
+              : 'User suspension lifted',
+        ),
+      ),
     );
   }
 }
