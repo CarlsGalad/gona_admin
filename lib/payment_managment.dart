@@ -158,15 +158,17 @@ class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
                 });
               },
               decoration: InputDecoration(
+                filled: true,
                 fillColor: Colors.white,
                 hintText: 'Search...',
+                hintStyle: GoogleFonts.abel(color: Colors.black),
                 border: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.white),
+                  borderSide: const BorderSide(color: Colors.black54),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 prefixIcon: const Icon(
                   Icons.search,
-                  color: Colors.white54,
+                  color: Colors.black54,
                 ),
               ),
             ),
@@ -188,9 +190,12 @@ class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Releasing Payments to Vendors',
-                              style: GoogleFonts.aboreto(
-                                  fontWeight: FontWeight.bold, fontSize: 18)),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Text('Releasing Payments to Vendors',
+                                style: GoogleFonts.aboreto(
+                                    fontWeight: FontWeight.bold, fontSize: 18)),
+                          ),
                           const Divider(
                             indent: 5,
                             endIndent: 5,
