@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gona_admin/user/insights.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
 import 'package:intl/intl.dart';
 
@@ -45,26 +47,45 @@ class OurUsersScreenState extends State<OurUsersScreen> {
           width: MediaQuery.of(context).size.width - 155,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10), color: Colors.blueGrey),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: _buildUsersListView(),
+          child: Scaffold(
+            backgroundColor: Colors.black54,
+            appBar: AppBar(
+              title: Text(
+                'Users',
+                style: GoogleFonts.roboto(),
               ),
-              const VerticalDivider(
-                thickness: 1,
-                width: 2,
-                color: Color.fromARGB(255, 26, 25, 25),
-              ),
-              Expanded(
-                flex: 3,
-                child: _selectedUserIndex == null
-                    ? const Center(
-                        child: Text('Please select a user'),
-                      )
-                    : _buildUserDetailsView(),
-              ),
-            ],
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CustomerInsightsScreen()));
+                    },
+                    icon: Icon(Icons.insights))
+              ],
+            ),
+            body: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: _buildUsersListView(),
+                ),
+                const VerticalDivider(
+                  thickness: 1,
+                  width: 2,
+                  color: Color.fromARGB(255, 26, 25, 25),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: _selectedUserIndex == null
+                      ? const Center(
+                          child: Text('Please select a user'),
+                        )
+                      : _buildUserDetailsView(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
