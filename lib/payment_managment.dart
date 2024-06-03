@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
@@ -36,7 +37,9 @@ class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
         double price = item['price'];
         int quantity = item['quantity'];
         double deliveryFee = item['deliveryFee'] ?? 0.0;
-        double totalAmount = (price * quantity) * 0.94 - deliveryFee;
+        double amountBeforeVAT = (price * quantity) * 0.94 - deliveryFee;
+        double VAT = amountBeforeVAT * 0.075;
+        double totalAmount = amountBeforeVAT - VAT;
 
         DocumentSnapshot farmDoc =
             await _firestore.collection('farms').doc(farmId).get();
@@ -78,7 +81,9 @@ class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
         double price = item['price'];
         int quantity = item['quantity'];
         double deliveryFee = item['deliveryFee'] ?? 0.0;
-        double totalAmount = (price * quantity) * 0.94 - deliveryFee;
+        double amountBeforeVAT = (price * quantity) * 0.94 - deliveryFee;
+        double VAT = amountBeforeVAT * 0.075;
+        double totalAmount = amountBeforeVAT - VAT;
 
         DocumentSnapshot farmDoc =
             await _firestore.collection('farms').doc(farmId).get();
@@ -127,7 +132,13 @@ class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
+        leading: IconButton(
+          color: Colors.white54,
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(CupertinoIcons.back),
+        ),
         backgroundColor: Colors.black,
         title: Text(
           'Payment Management',
@@ -139,6 +150,7 @@ class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 200.0, vertical: 8),
             child: TextField(
+              style: GoogleFonts.abel(color: Colors.white),
               controller: _searchController,
               onChanged: (value) {
                 setState(() {
@@ -335,16 +347,22 @@ class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Escrow Account Details',
-                            style: GoogleFonts.aboreto(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          const Divider(
-                            indent: 5,
-                            endIndent: 600,
+                          Column(
+                            children: [
+                              Text(
+                                'Escrow Account Details',
+                                style: GoogleFonts.aboreto(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                              const Divider(
+                                height: 0.5,
+                                indent: 5,
+                                endIndent: 5,
+                              ),
+                            ],
                           ),
                           FutureBuilder<List<Map<String, dynamic>>>(
                             future: _fetchEscrowDetails(),
