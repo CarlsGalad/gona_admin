@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:gona_admin/home/home_screen.dart';
+import 'package:gona_admin/payment_managment.dart';
 import 'package:gona_admin/transcactions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
@@ -248,7 +249,19 @@ class _AdminHomeState extends State<AdminHome> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TransactionsScreen()));
+                          builder: (context) => PaymentManagementScreen()));
+                },
+                icon: const Icon(Icons.wallet)),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0, left: 8),
+            child: IconButton(
+                color: Colors.grey,
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const TransactionsScreen()));
                 },
                 icon: const Icon(Icons.history)),
           ),
@@ -273,7 +286,10 @@ class _AdminHomeState extends State<AdminHome> {
                                     child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.face_retouching_natural),
+                                    const Icon(
+                                      Icons.notifications_none,
+                                      size: 50,
+                                    ),
                                     Text(
                                       'You have no notifications',
                                       style: GoogleFonts.abel(),
@@ -441,6 +457,8 @@ class _AdminHomeState extends State<AdminHome> {
                                     ),
                                     const SizedBox(height: 10),
                                     InkWell(
+                                      splashFactory: InkSparkle.splashFactory,
+                                      splashColor: Colors.white,
                                       onTap: _logout,
                                       child: Container(
                                         decoration: BoxDecoration(
