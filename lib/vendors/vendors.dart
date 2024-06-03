@@ -142,39 +142,78 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
                   });
                   _fetchVendorItems(vendor['userId']);
                 },
-                trailing: IconButton(
-                  icon: Icon(
-                    status == 'suspended' ? Icons.lock_open : Icons.block,
-                    color: status == 'suspended' ? Colors.green : Colors.orange,
-                  ),
-                  onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(status == 'suspended'
-                            ? 'Lift Suspension'
-                            : 'Suspend Vendor'),
-                        content: Text(status == 'suspended'
-                            ? 'Are you sure you want to lift the suspension on this vendor?'
-                            : 'Are you sure you want to suspend this vendor?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: Text(status == 'suspended'
-                                ? 'Lift Suspension'
-                                : 'Suspend'),
-                          ),
-                        ],
+                trailing: SizedBox(
+                  width: 100,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          status == 'suspended' ? Icons.lock_open : Icons.block,
+                          color: status == 'suspended'
+                              ? Colors.green
+                              : Colors.orange,
+                        ),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(status == 'suspended'
+                                  ? 'Lift Suspension'
+                                  : 'Suspend Vendor'),
+                              content: Text(status == 'suspended'
+                                  ? 'Are you sure you want to lift the suspension on this vendor?'
+                                  : 'Are you sure you want to suspend this vendor?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: Text(status == 'suspended'
+                                      ? 'Lift Suspension'
+                                      : 'Suspend'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            _toggleVendorSuspension(index);
+                          }
+                        },
                       ),
-                    );
-                    if (confirm == true) {
-                      _toggleVendorSuspension(index);
-                    }
-                  },
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Delete Vendor'),
+                              content: const Text(
+                                  'Are you sure you want to delete this vendor?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            _deleteVendor(index);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
