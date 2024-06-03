@@ -51,18 +51,24 @@ class OurUsersScreenState extends State<OurUsersScreen> {
             backgroundColor: Colors.black54,
             appBar: AppBar(
               title: Text(
-                'Users',
+                'Customers',
                 style: GoogleFonts.roboto(),
               ),
+              centerTitle: true,
               actions: [
-                IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CustomerInsightsScreen()));
-                    },
-                    icon: Icon(Icons.insights))
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: IconButton(
+                      tooltip: 'Customer Insights',
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    CustomerInsightsScreen()));
+                      },
+                      icon: const Icon(Icons.insights)),
+                )
               ],
             ),
             body: Row(
