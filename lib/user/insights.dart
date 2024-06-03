@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomerInsightsScreen extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -17,11 +19,14 @@ class CustomerInsightsScreen extends StatelessWidget {
       Map<String, int> itemFrequency = {};
 
       for (var purchase in purchaseHistory) {
-        String orderId = purchase['order_id'];
-        if (itemFrequency.containsKey(orderId)) {
-          itemFrequency[orderId] = itemFrequency[orderId]! + 1;
-        } else {
-          itemFrequency[orderId] = 1;
+        List<String> itemNames =
+            List<String>.from(purchase['item_names'] ?? []);
+        for (var itemName in itemNames) {
+          if (itemFrequency.containsKey(itemName)) {
+            itemFrequency[itemName] = itemFrequency[itemName]! + 1;
+          } else {
+            itemFrequency[itemName] = 1;
+          }
         }
       }
 
@@ -91,23 +96,22 @@ class CustomerInsightsScreen extends StatelessWidget {
         if (constraints.maxWidth > 800) {
           // Desktop layout
           return Scaffold(
+            backgroundColor: Colors.grey[300],
             appBar: AppBar(
-              title: const Text('Customer Insights'),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(60.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Search',
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: (value) {
-                      // Implement search logic here
-                    },
-                  ),
-                ),
+              centerTitle: true,
+              backgroundColor: Colors.black,
+              leading: IconButton(
+                  tooltip: 'Back',
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    CupertinoIcons.back,
+                    color: Colors.white54,
+                  )),
+              title: Text(
+                'Customer Insights',
+                style: GoogleFonts.roboto(color: Colors.white54),
               ),
             ),
             body: Padding(
@@ -119,8 +123,8 @@ class CustomerInsightsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Customer Purchase Behavior',
-                            style: TextStyle(
+                        Text('Customer Purchase Behavior',
+                            style: GoogleFonts.aboreto(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
                         FutureBuilder<List<Map<String, dynamic>>>(
@@ -133,8 +137,10 @@ class CustomerInsightsScreen extends StatelessWidget {
                             }
 
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return const Text(
-                                  'No purchase behavior data available.');
+                              return Text(
+                                'No purchase behavior data available.',
+                                style: GoogleFonts.abel(),
+                              );
                             }
 
                             return Expanded(
@@ -144,10 +150,11 @@ class CustomerInsightsScreen extends StatelessWidget {
                                   var data = snapshot.data![index];
                                   return Card(
                                     child: ListTile(
-                                      title: Text(data['customerName']),
+                                      title: Text(data['customerName'],
+                                          style: GoogleFonts.abel()),
                                       subtitle: Text(
-                                        'Total Purchases: ${data['totalPurchases']}\nFrequent Items: ${data['frequentItems'].join(', ')}',
-                                      ),
+                                          'Total Purchases: ${data['totalPurchases']}\nFrequent Items: ${data['frequentItems'].join(', ')}',
+                                          style: GoogleFonts.abel()),
                                     ),
                                   );
                                 },
@@ -156,8 +163,8 @@ class CustomerInsightsScreen extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 20),
-                        const Text('Retention and Churn Rates',
-                            style: TextStyle(
+                        Text('Retention and Churn Rates',
+                            style: GoogleFonts.aboreto(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
                         FutureBuilder<Map<String, double>>(
@@ -170,8 +177,9 @@ class CustomerInsightsScreen extends StatelessWidget {
                             }
 
                             if (!snapshot.hasData) {
-                              return const Text(
-                                  'No retention and churn rate data available.');
+                              return Text(
+                                  'No retention and churn rate data available.',
+                                  style: GoogleFonts.abel());
                             }
 
                             return Row(
@@ -179,18 +187,20 @@ class CustomerInsightsScreen extends StatelessWidget {
                               children: [
                                 Column(
                                   children: [
-                                    const Text('Retention Rate',
-                                        style: TextStyle(fontSize: 16)),
+                                    Text('Retention Rate',
+                                        style: GoogleFonts.abel(fontSize: 16)),
                                     Text(
-                                        '${snapshot.data!['retentionRate']!.toStringAsFixed(2)}%'),
+                                        '${snapshot.data!['retentionRate']!.toStringAsFixed(2)}%',
+                                        style: GoogleFonts.abel()),
                                   ],
                                 ),
                                 Column(
                                   children: [
-                                    const Text('Churn Rate',
-                                        style: TextStyle(fontSize: 16)),
+                                    Text('Churn Rate',
+                                        style: GoogleFonts.abel(fontSize: 16)),
                                     Text(
-                                        '${snapshot.data!['churnRate']!.toStringAsFixed(2)}%'),
+                                        '${snapshot.data!['churnRate']!.toStringAsFixed(2)}%',
+                                        style: GoogleFonts.abel()),
                                   ],
                                 ),
                               ],
@@ -198,8 +208,8 @@ class CustomerInsightsScreen extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 20),
-                        const Text('Customer Satisfaction Scores',
-                            style: TextStyle(
+                        Text('Customer Satisfaction Scores',
+                            style: GoogleFonts.aboreto(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
                         FutureBuilder<List<Map<String, dynamic>>>(
@@ -212,8 +222,8 @@ class CustomerInsightsScreen extends StatelessWidget {
                             }
 
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return const Text(
-                                  'No satisfaction scores available.');
+                              return Text('No satisfaction scores available.',
+                                  style: GoogleFonts.abel());
                             }
                             return Expanded(
                               child: ListView.builder(
@@ -222,9 +232,11 @@ class CustomerInsightsScreen extends StatelessWidget {
                                   var data = snapshot.data![index];
                                   return Card(
                                     child: ListTile(
-                                      title: Text(data['customerName']),
+                                      title: Text(data['customerName'],
+                                          style: GoogleFonts.abel()),
                                       subtitle: Text(
                                         'Score: ${data['score']}\nComment: ${data['comment']}',
+                                        style: GoogleFonts.abel(),
                                       ),
                                     ),
                                   );
@@ -242,8 +254,8 @@ class CustomerInsightsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Customer Insights Overview',
-                            style: TextStyle(
+                        Text('Customer Insights Overview',
+                            style: GoogleFonts.aboreto(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
                         FutureBuilder<Map<String, double>>(
@@ -256,7 +268,8 @@ class CustomerInsightsScreen extends StatelessWidget {
                             }
 
                             if (!snapshot.hasData) {
-                              return const Text('No overview data available.');
+                              return Text('No overview data available.',
+                                  style: GoogleFonts.abel());
                             }
 
                             return Column(
@@ -264,10 +277,10 @@ class CustomerInsightsScreen extends StatelessWidget {
                               children: [
                                 Text(
                                     'Retention Rate: ${snapshot.data!['retentionRate']!.toStringAsFixed(2)}%',
-                                    style: const TextStyle(fontSize: 16)),
+                                    style: GoogleFonts.abel(fontSize: 16)),
                                 Text(
                                     'Churn Rate: ${snapshot.data!['churnRate']!.toStringAsFixed(2)}%',
-                                    style: const TextStyle(fontSize: 16)),
+                                    style: GoogleFonts.abel(fontSize: 16)),
                               ],
                             );
                           },
@@ -296,9 +309,9 @@ class CustomerInsightsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Total Purchases: $totalPurchases',
-                                    style: const TextStyle(fontSize: 16)),
-                                const Text('Frequent Items:',
-                                    style: TextStyle(fontSize: 16)),
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                                Text('Frequent Items:',
+                                    style: GoogleFonts.abel(fontSize: 16)),
                                 ...snapshot.data!
                                     .expand((data) => data['frequentItems'])
                                     .map((item) => Text(item))
