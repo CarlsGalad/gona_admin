@@ -244,6 +244,7 @@ class _AdminHomeState extends State<AdminHome> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0, left: 8),
             child: IconButton(
+                tooltip: 'Payment Manangement',
                 color: Colors.grey,
                 onPressed: () {
                   Navigator.push(
@@ -256,6 +257,7 @@ class _AdminHomeState extends State<AdminHome> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0, left: 8),
             child: IconButton(
+                tooltip: 'Transaction History',
                 color: Colors.grey,
                 onPressed: () {
                   Navigator.push(
@@ -341,6 +343,7 @@ class _AdminHomeState extends State<AdminHome> {
               : Padding(
                   padding: const EdgeInsets.only(right: 20.0),
                   child: PopupMenuButton(
+                    tooltip: 'My Profile',
                     elevation: 5,
                     iconSize: 25,
                     splashRadius: 30,
