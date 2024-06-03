@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PaymentManagementScreen extends StatefulWidget {
-  const PaymentManagementScreen({super.key});
-
   @override
-  PaymentManagementScreenState createState() => PaymentManagementScreenState();
+  _PaymentManagementScreenState createState() =>
+      _PaymentManagementScreenState();
 }
 
-class PaymentManagementScreenState extends State<PaymentManagementScreen> {
+class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   Future<List<Map<String, dynamic>>> _fetchPaymentReleases() async {
     List<Map<String, dynamic>> paymentReleases = [];
@@ -125,7 +128,38 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment Management'),
+        backgroundColor: Colors.black,
+        title: Text(
+          'Payment Management',
+          style: GoogleFonts.roboto(color: Colors.white54),
+        ),
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 200.0, vertical: 8),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+              decoration: InputDecoration(
+                fillColor: Colors.white,
+                hintText: 'Search...',
+                border: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.white),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.white54,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -139,11 +173,16 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Releasing Payments to Vendors',
-                              style: TextStyle(
+                          Text('Releasing Payments to Vendors',
+                              style: GoogleFonts.aboreto(
                                   fontWeight: FontWeight.bold, fontSize: 18)),
+                          const Divider(
+                            indent: 5,
+                            endIndent: 5,
+                          ),
                           FutureBuilder<List<Map<String, dynamic>>>(
                             future: _fetchPaymentReleases(),
                             builder: (context, snapshot) {
@@ -154,8 +193,33 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                               }
 
                               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return const Text('No payments to release.');
+                                return Center(
+                                  child: Text(
+                                    'No payments to release.',
+                                    style: GoogleFonts.abel(),
+                                  ),
+                                );
                               }
+
+                              List<Map<String, dynamic>> filteredData =
+                                  snapshot.data!.where((payment) {
+                                return payment['farmName']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery) ||
+                                    payment['accountNumber']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery) ||
+                                    payment['bankName']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery) ||
+                                    payment['accountName']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery);
+                              }).toList();
 
                               return DataTable(
                                 columns: const [
@@ -165,7 +229,7 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                                   DataColumn(label: Text('Bank Name')),
                                   DataColumn(label: Text('Account Name')),
                                 ],
-                                rows: snapshot.data!.map((payment) {
+                                rows: filteredData.map((payment) {
                                   return DataRow(
                                     cells: [
                                       DataCell(Text(payment['farmName'])),
@@ -181,9 +245,19 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                             },
                           ),
                           const SizedBox(height: 20),
-                          const Text('Refund Management',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18)),
+                          const Divider(
+                            thickness: 1,
+                          ),
+                          Text(
+                            'Refund Management',
+                            style: GoogleFonts.aboreto(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                          const Divider(
+                            height: 0.5,
+                            indent: 5,
+                            endIndent: 5,
+                          ),
                           FutureBuilder<List<Map<String, dynamic>>>(
                             future: _fetchRefunds(),
                             builder: (context, snapshot) {
@@ -194,8 +268,33 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                               }
 
                               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return const Text('No refunds available.');
+                                return Center(
+                                  child: Text(
+                                    'No refunds available.',
+                                    style: GoogleFonts.abel(),
+                                  ),
+                                );
                               }
+
+                              List<Map<String, dynamic>> filteredData =
+                                  snapshot.data!.where((refund) {
+                                return refund['firstName']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery) ||
+                                    refund['lastName']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery) ||
+                                    refund['email']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery) ||
+                                    refund['mobile']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_searchQuery);
+                              }).toList();
 
                               return DataTable(
                                 columns: const [
@@ -206,7 +305,7 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                                   DataColumn(label: Text('Email')),
                                   DataColumn(label: Text('Mobile')),
                                 ],
-                                rows: snapshot.data!.map((refund) {
+                                rows: filteredData.map((refund) {
                                   return DataRow(
                                     cells: [
                                       DataCell(Text(refund['resolve'])),
@@ -227,6 +326,9 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                     ),
                   ),
                 ),
+                const VerticalDivider(
+                  width: 1,
+                ),
                 Expanded(
                   flex: 1,
                   child: SingleChildScrollView(
@@ -235,9 +337,15 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Escrow Account Details',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18)),
+                          Text(
+                            'Escrow Account Details',
+                            style: GoogleFonts.aboreto(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                          const Divider(
+                            indent: 5,
+                            endIndent: 600,
+                          ),
                           FutureBuilder<List<Map<String, dynamic>>>(
                             future: _fetchEscrowDetails(),
                             builder: (context, snapshot) {
@@ -248,9 +356,21 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                               }
 
                               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return const Text(
-                                    'No escrow details available.');
+                                return Center(
+                                  child: Text(
+                                    'No escrow details available.',
+                                    style: GoogleFonts.abel(),
+                                  ),
+                                );
                               }
+
+                              List<Map<String, dynamic>> filteredData =
+                                  snapshot.data!.where((escrow) {
+                                return escrow['farmName']
+                                    .toString()
+                                    .toLowerCase()
+                                    .contains(_searchQuery);
+                              }).toList();
 
                               return DataTable(
                                 columns: const [
@@ -258,7 +378,7 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                                   DataColumn(label: Text('Amount')),
                                   DataColumn(label: Text('Release Schedule')),
                                 ],
-                                rows: snapshot.data!.map((escrow) {
+                                rows: filteredData.map((escrow) {
                                   return DataRow(
                                     cells: [
                                       DataCell(Text(escrow['farmName'])),
@@ -302,6 +422,26 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                           return const Text('No payments to release.');
                         }
 
+                        List<Map<String, dynamic>> filteredData =
+                            snapshot.data!.where((payment) {
+                          return payment['farmName']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery) ||
+                              payment['accountNumber']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery) ||
+                              payment['bankName']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery) ||
+                              payment['accountName']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery);
+                        }).toList();
+
                         return DataTable(
                           columns: const [
                             DataColumn(label: Text('Vendor')),
@@ -310,7 +450,7 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                             DataColumn(label: Text('Bank Name')),
                             DataColumn(label: Text('Account Name')),
                           ],
-                          rows: snapshot.data!.map((payment) {
+                          rows: filteredData.map((payment) {
                             return DataRow(
                               cells: [
                                 DataCell(Text(payment['farmName'])),
@@ -319,42 +459,6 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                                 DataCell(Text(payment['accountNumber'])),
                                 DataCell(Text(payment['bankName'])),
                                 DataCell(Text(payment['accountName'])),
-                              ],
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    const Text('Escrow Account Details',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18)),
-                    FutureBuilder<List<Map<String, dynamic>>>(
-                      future: _fetchEscrowDetails(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
-
-                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Text('No escrow details available.');
-                        }
-
-                        return DataTable(
-                          columns: const [
-                            DataColumn(label: Text('Vendor')),
-                            DataColumn(label: Text('Amount')),
-                            DataColumn(label: Text('Release Schedule')),
-                          ],
-                          rows: snapshot.data!.map((escrow) {
-                            return DataRow(
-                              cells: [
-                                DataCell(Text(escrow['farmName'])),
-                                DataCell(Text(
-                                    escrow['totalAmount'].toStringAsFixed(2))),
-                                DataCell(Text(escrow['releaseSchedule'])),
                               ],
                             );
                           }).toList(),
@@ -378,6 +482,26 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                           return const Text('No refunds available.');
                         }
 
+                        List<Map<String, dynamic>> filteredData =
+                            snapshot.data!.where((refund) {
+                          return refund['firstName']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery) ||
+                              refund['lastName']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery) ||
+                              refund['email']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery) ||
+                              refund['mobile']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery);
+                        }).toList();
+
                         return DataTable(
                           columns: const [
                             DataColumn(label: Text('Resolve')),
@@ -387,7 +511,7 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                             DataColumn(label: Text('Email')),
                             DataColumn(label: Text('Mobile')),
                           ],
-                          rows: snapshot.data!.map((refund) {
+                          rows: filteredData.map((refund) {
                             return DataRow(
                               cells: [
                                 DataCell(Text(refund['resolve'])),
@@ -397,6 +521,50 @@ class PaymentManagementScreenState extends State<PaymentManagementScreen> {
                                     Text(refund['amount'].toStringAsFixed(2))),
                                 DataCell(Text(refund['email'])),
                                 DataCell(Text(refund['mobile'])),
+                              ],
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Escrow Account Details',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18)),
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _fetchEscrowDetails(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return const Text('No escrow details available.');
+                        }
+
+                        List<Map<String, dynamic>> filteredData =
+                            snapshot.data!.where((escrow) {
+                          return escrow['farmName']
+                              .toString()
+                              .toLowerCase()
+                              .contains(_searchQuery);
+                        }).toList();
+
+                        return DataTable(
+                          columns: const [
+                            DataColumn(label: Text('Vendor')),
+                            DataColumn(label: Text('Amount')),
+                            DataColumn(label: Text('Release Schedule')),
+                          ],
+                          rows: filteredData.map((escrow) {
+                            return DataRow(
+                              cells: [
+                                DataCell(Text(escrow['farmName'])),
+                                DataCell(Text(
+                                    escrow['totalAmount'].toStringAsFixed(2))),
+                                DataCell(Text(escrow['releaseSchedule'])),
                               ],
                             );
                           }).toList(),
