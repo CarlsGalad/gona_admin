@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_network/image_network.dart';
 
 class AdminManagementScreen extends StatefulWidget {
   const AdminManagementScreen({super.key});
@@ -15,6 +16,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   DocumentSnapshot? _selectedAdmin;
   DocumentSnapshot? _headAdmin;
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -42,6 +44,60 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
     return await _firestore.collection('admin').doc(adminId).get();
   }
 
+  Future<void> _toggleSuspendAdmin(String adminId) async {
+    DocumentSnapshot adminSnapshot =
+        await _firestore.collection('admin').doc(adminId).get();
+    String currentStatus = adminSnapshot.get('status' == 'active');
+    String newStatus = currentStatus == 'suspended' ? 'active' : 'suspended';
+    await _firestore
+        .collection('admin')
+        .doc(adminId)
+        .update({'status': newStatus});
+  }
+
+  Future<void> _deleteAdmin(String adminId) async {
+    await _firestore.collection('admin').doc(adminId).delete();
+  }
+
+  Future<void> _showConfirmationDialog(String adminId, String action) async {
+    bool confirm = false;
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('$action Admin'),
+        content: Text('Are you sure you want to $action this admin?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Confirm'),
+          ),
+        ],
+      ),
+    ).then((value) {
+      confirm = value ?? false;
+    });
+
+    if (confirm) {
+      setState(() {
+        _isProcessing = true;
+      });
+
+      if (action == 'Suspend/Unsuspend') {
+        await _toggleSuspendAdmin(adminId);
+      } else if (action == 'Delete') {
+        await _deleteAdmin(adminId);
+      }
+
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -60,7 +116,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
             Expanded(
               flex: 1,
               child: Container(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 color: Colors.grey[200],
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +126,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     const Divider(),
                     _headAdmin == null
-                        ? Center(child: CircularProgressIndicator())
+                        ? const Center(child: CircularProgressIndicator())
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -91,7 +147,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
             Expanded(
               flex: 2,
               child: Container(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 color: Colors.white,
                 child: FutureBuilder<List<DocumentSnapshot>>(
                   future: _fetchAdmins(),
@@ -111,23 +167,61 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                       itemBuilder: (context, index) {
                         var admin =
                             admins[index].data() as Map<String, dynamic>;
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(admin['imagePath'] ?? ''),
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(color: Colors.grey[200]),
+                            child: ListTile(
+                              selectedTileColor: Colors.grey[200],
+                              minLeadingWidth: 50,
+                              leading: SizedBox(
+                                width: 50,
+                                child: ImageNetwork(
+                                  image: admin['imagePath'] ?? '',
+                                  width: 50,
+                                  height: 50,
+                                  borderRadius: BorderRadius.circular(45),
+                                ),
+                              ),
+                              title: Text(admin['firstName'],
+                                  style: GoogleFonts.abel()),
+                              subtitle: Text(
+                                  '${admin['department'] ?? ''} - ${admin['role'] ?? ''}',
+                                  style: GoogleFonts.abel()),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(admin['status'] == 'suspended'
+                                        ? Icons.play_arrow
+                                        : Icons.pause),
+                                    color: admin['status'] == 'suspended'
+                                        ? Colors.green
+                                        : Colors.orange,
+                                    onPressed: () {
+                                      _showConfirmationDialog(admins[index].id,
+                                          'Suspend/Unsuspend');
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      _showConfirmationDialog(
+                                          admins[index].id, 'Delete');
+                                    },
+                                  ),
+                                ],
+                              ),
+                              onTap: () async {
+                                DocumentSnapshot adminDetails =
+                                    await _fetchAdminDetails(admins[index].id);
+                                setState(() {
+                                  _selectedAdmin = adminDetails;
+                                });
+                              },
+                            ),
                           ),
-                          title: Text(admin['firstName'],
-                              style: GoogleFonts.abel()),
-                          subtitle: Text(
-                              '${admin['department'] ?? ''} - ${admin['role'] ?? ''}',
-                              style: GoogleFonts.abel()),
-                          onTap: () async {
-                            DocumentSnapshot adminDetails =
-                                await _fetchAdminDetails(admins[index].id);
-                            setState(() {
-                              _selectedAdmin = adminDetails;
-                            });
-                          },
                         );
                       },
                     );
@@ -141,7 +235,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
             Expanded(
               flex: 1,
               child: Container(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 color: Colors.grey[100],
                 child: _selectedAdmin == null
                     ? Center(
@@ -159,10 +253,9 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                               style: GoogleFonts.abel(fontSize: 16)),
                           Text('Email: ${_selectedAdmin!['email']}',
                               style: GoogleFonts.abel(fontSize: 16)),
-                          Text(
-                              'Department: ${_selectedAdmin!['department'] ?? ''}',
+                          Text('Department: ${_selectedAdmin!['department']}',
                               style: GoogleFonts.abel(fontSize: 16)),
-                          Text('Role: ${_selectedAdmin!['role'] ?? ''}',
+                          Text('Role: ${_selectedAdmin!['role']}',
                               style: GoogleFonts.abel(fontSize: 16)),
                           const Divider(),
                           Text('Activity Logs',
@@ -172,12 +265,12 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                           // Display activity logs here
                           Expanded(
                             child: ListView.builder(
-                              itemCount: (_selectedAdmin!['activityLogs'] ??
-                                      '' as List)
+                              itemCount: (_selectedAdmin!['activityLogs']
+                                      as Map<String, dynamic>)
                                   .length,
                               itemBuilder: (context, index) {
-                                var log = (_selectedAdmin!['activityLogs'] ??
-                                    '' as List)[index];
+                                var log = (_selectedAdmin!['activityLogs']
+                                    as Map<String, dynamic>)[index];
                                 return ListTile(
                                   title: Text(log, style: GoogleFonts.abel()),
                                 );
