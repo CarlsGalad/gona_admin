@@ -1,19 +1,42 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/rendering.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
+import 'services/payment_service.dart';
+
 class PaymentManagementScreen extends StatefulWidget {
+  const PaymentManagementScreen({super.key});
+
   @override
-  _PaymentManagementScreenState createState() =>
-      _PaymentManagementScreenState();
+  PaymentManagementScreenState createState() => PaymentManagementScreenState();
 }
 
-class _PaymentManagementScreenState extends State<PaymentManagementScreen> {
+class PaymentManagementScreenState extends State<PaymentManagementScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+
+final PaymentService paymentService = PaymentService();
+
+  Future<void> releasePaymentsToVendors() async {
+    List<Map<String, dynamic>> paymentReleases = await _fetchPaymentReleases();
+
+    List<Map<String, dynamic>> payments = paymentReleases.map((payment) {
+      return {
+        "bank_code": payment['bankName'],
+        "account_number": payment['accountNumber'],
+        "amount": payment['totalAmount'],
+        "currency": "NGN",
+        "narration": "Payment for farm produce",
+        "beneficiary_name": payment['accountName'],
+      };
+    }).toList();
+
+    await paymentService.makeBulkTransfer(payments);
+  }
+
 
   Future<List<Map<String, dynamic>>> _fetchPaymentReleases() async {
     List<Map<String, dynamic>> paymentReleases = [];
