@@ -525,8 +525,11 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   itemBuilder: (context, index) {
                     final result = _searchResults[index];
                     return Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 200.0, vertical: 8),
                       child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6)),
                         color: Colors.black38,
                         child: ListTile(
                           title: Text(
