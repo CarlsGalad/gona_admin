@@ -61,11 +61,16 @@ class NewsScreenState extends State<NewsScreen> {
                                     NewsDetailScreen(newsItem: newsItem);
                               });
                             },
+                            minTileHeight: 80,
                             leading: SizedBox(
                               height: 200,
-                              width: 200,
+                              width: 100,
                               child: ImageNetwork(
-                                  image: imageUrl, height: 200, width: 200),
+                                image: imageUrl,
+                                height: 200,
+                                width: 100,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                             ),
                             title: Text(newsItem.title),
                             subtitle: Text(
