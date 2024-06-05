@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:gona_admin/headadmin/admin_manage.dart';
 
 import 'package:gona_admin/home/home_screen.dart';
 import 'package:gona_admin/payment_managment.dart';
@@ -169,6 +170,9 @@ class _AdminHomeState extends State<AdminHome> {
         break;
       case 8:
         screen = const ManageDisputesScreen();
+        break;
+      case 9:
+        screen = const AdminManagementScreen();
         break;
       default:
         screen = Container(); // Add default case or handle error
@@ -559,6 +563,10 @@ class _AdminHomeState extends State<AdminHome> {
                             NavigationRailDestination(
                               icon: Icon(Icons.adjust),
                               label: Text('Manage Disputes'),
+                            ),
+                            NavigationRailDestination(
+                              icon: Icon(Icons.manage_accounts),
+                              label: Text('Admin'),
                             ),
                           ],
                         ),
