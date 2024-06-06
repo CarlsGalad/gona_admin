@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
+import 'package:intl/intl.dart';
 
 class AdminManagementScreen extends StatefulWidget {
   const AdminManagementScreen({super.key});
@@ -16,7 +17,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   DocumentSnapshot? _selectedAdmin;
   DocumentSnapshot? _headAdmin;
-  bool _isProcessing = false;
+  bool isProcessing = false;
 
   @override
   void initState() {
@@ -80,11 +81,11 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Confirm'),
+            child: const Text('Confirm'),
           ),
         ],
       ),
@@ -94,7 +95,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
 
     if (confirm) {
       setState(() {
-        _isProcessing = true;
+        isProcessing = true;
       });
 
       if (action == 'Suspend/Unsuspend') {
@@ -104,9 +105,229 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
       }
 
       setState(() {
-        _isProcessing = false;
+        isProcessing = false;
       });
     }
+  }
+
+  Future<void> _editAdminDetails() async {
+    TextEditingController dobController = TextEditingController(
+        text: _selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('birthDate')
+            ? _selectedAdmin!['birthDate']
+            : '');
+    TextEditingController departmentController = TextEditingController(
+        text: _selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('department')
+            ? _selectedAdmin!['department']
+            : '');
+    TextEditingController roleController = TextEditingController(
+        text: _selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('role')
+            ? _selectedAdmin!['role']
+            : '');
+    TextEditingController addressController = TextEditingController(
+        text: _selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('address')
+            ? _selectedAdmin!['address']
+            : '');
+    TextEditingController nextOfKinController = TextEditingController(
+        text: _selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('nextOfKin')
+            ? _selectedAdmin!['nextOfKin']
+            : '');
+    TextEditingController nextOfKinMobileController = TextEditingController(
+        text: _selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('nextOfKinMobile')
+            ? _selectedAdmin!['nextOfKinMobile']
+            : '');
+    TextEditingController nextOfKinMailController = TextEditingController(
+        text: _selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('nextOfKinMail')
+            ? _selectedAdmin!['nextOfKinMail']
+            : '');
+
+    List<Map<String, String>> qualifications =
+        (_selectedAdmin!.data() != null &&
+                (_selectedAdmin!.data() as Map<String, dynamic>)
+                    .containsKey('qalification')
+            ? List<Map<String, String>>.from(_selectedAdmin!['qualification'])
+            : []);
+    // Initialize qualification controllers outside initState
+    List<TextEditingController> qualificationControllers = List.generate(
+        qualifications.length, (index) => TextEditingController());
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update Details', style: GoogleFonts.roboto()),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: departmentController,
+                  decoration: InputDecoration(
+                      labelText: 'Department', labelStyle: GoogleFonts.abel()),
+                ),
+                TextField(
+                  controller: roleController,
+                  decoration: InputDecoration(
+                      labelText: 'Role', labelStyle: GoogleFonts.abel()),
+                ),
+                TextField(
+                  controller: addressController,
+                  decoration: InputDecoration(
+                      labelText: 'Address', labelStyle: GoogleFonts.abel()),
+                ),
+                TextField(
+                  controller: nextOfKinController,
+                  decoration: InputDecoration(
+                      labelText: 'Next of Kin', labelStyle: GoogleFonts.abel()),
+                ),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  controller: nextOfKinMobileController,
+                  decoration: InputDecoration(
+                      labelText: 'Next of Kin Mobile',
+                      labelStyle: GoogleFonts.abel()),
+                ),
+                TextField(
+                  controller: nextOfKinMailController,
+                  decoration: InputDecoration(
+                      labelText: 'Next of Kin Mail',
+                      labelStyle: GoogleFonts.abel()),
+                ),
+                TextField(
+                  controller: dobController,
+                  decoration: InputDecoration(
+                    labelText: 'D.O.B',
+                    labelStyle: GoogleFonts.abel(),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.calendar_today),
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            dobController.text =
+                                DateFormat('yyyy-MM-dd').format(pickedDate);
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text('Qualifications', style: GoogleFonts.abel()),
+                Visibility(
+                  visible: true,
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    ...qualifications.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      Map<String, String> qualification = entry.value;
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: qualificationControllers[index],
+                            decoration:
+                                const InputDecoration(labelText: 'Institution'),
+                            onChanged: (value) =>
+                                qualification['institution'] = value,
+                          ),
+                          TextField(
+                            controller: qualificationControllers[index],
+                            decoration: const InputDecoration(
+                                labelText: 'Course Studied'),
+                            onChanged: (value) =>
+                                qualification['courseStudied'] = value,
+                          ),
+                          TextField(
+                            controller: qualificationControllers[index],
+                            decoration:
+                                const InputDecoration(labelText: 'Year'),
+                            onChanged: (value) => qualification['year'] = value,
+                          ),
+                          TextField(
+                            controller: qualificationControllers[index],
+                            decoration: const InputDecoration(
+                                labelText: 'Certificate No.'),
+                            onChanged: (value) =>
+                                qualification['certificateNo'] = value,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      );
+                    }),
+                  ]),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    setState(() {
+                      qualifications.add({
+                        'institution': '',
+                        'courseStudied': '',
+                        'year': '',
+                        'certificateNo': '',
+                      });
+
+                      qualificationControllers.add(TextEditingController());
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await _firestore
+                    .collection('admin')
+                    .doc(_selectedAdmin!.id)
+                    .update({
+                  'D.O.B': dobController.text,
+                  'department': departmentController.text,
+                  'role': roleController.text,
+                  'address': addressController.text,
+                  'nextOfKin': nextOfKinController.text,
+                  'nextOfKinMobile': nextOfKinMobileController.text,
+                  'nextOfKinMail': nextOfKinMailController.text,
+                  'Qualification': qualifications,
+                });
+                Navigator.of(context).pop();
+                setState(() {
+                  _selectedAdmin = null; // Refresh the selected admin details
+                });
+              },
+              child:
+                  Text('Save', style: GoogleFonts.roboto(color: Colors.blue)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child:
+                  Text('Cancel', style: GoogleFonts.roboto(color: Colors.blue)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -117,7 +338,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Admin Management',
-              style: GoogleFonts.roboto(color: Colors.white)),
+              style: GoogleFonts.roboto(color: Colors.white54)),
           backgroundColor: Colors.black,
           centerTitle: true,
         ),
@@ -178,9 +399,8 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                       itemBuilder: (context, index) {
                         var admin =
                             admins[index].data() as Map<String, dynamic>;
-                        final name = admin['firsName'] ??
-                            '' + '' + admin['lastName'] ??
-                            '';
+                        final fistName = admin['firstName'] ?? '';
+                        final lastName = admin['lastName'] ?? '';
                         final status = admin['status'] ?? 'active';
                         final department = admin['department'] ?? '';
                         final role = admin['role'] ?? '';
@@ -201,7 +421,8 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                                   borderRadius: BorderRadius.circular(45),
                                 ),
                               ),
-                              title: Text(name, style: GoogleFonts.abel()),
+                              title: Text('$fistName $lastName',
+                                  style: GoogleFonts.abel()),
                               subtitle: Text('$department - $role',
                                   style: GoogleFonts.abel()),
                               trailing: Row(
@@ -262,13 +483,36 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Admin Details',
-                              style: GoogleFonts.aboreto(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                          Row(
+                            children: [
+                              Text('Admin Details',
+                                  style: GoogleFonts.aboreto(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: _editAdminDetails,
+                              ),
+                            ],
+                          ),
+                          ImageNetwork(
+                              image: '${_selectedAdmin!['imagePath']}',
+                              height: 100,
+                              width: 100),
                           const Divider(),
                           // Display selected admin details here
-                          Text('Name: ${_selectedAdmin!['firstName']}',
-                              style: GoogleFonts.abel(fontSize: 16)),
+                          Row(
+                            children: [
+                              Text('Name: ${_selectedAdmin!['firstName']}',
+                                  style: GoogleFonts.abel(fontSize: 16)),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Text('${_selectedAdmin!['lastName']}',
+                                  style: GoogleFonts.abel(fontSize: 16)),
+                            ],
+                          ),
                           Text('Email: ${_selectedAdmin!['email']}',
                               style: GoogleFonts.abel(fontSize: 16)),
                           Text('Department: ${_selectedAdmin!['department']}',
