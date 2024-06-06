@@ -78,6 +78,23 @@ class _SingUpPageState extends State<SingUpPage> {
           'lastName': lastNameController.text,
           'mobile': mobileController.text,
           'userId': user.uid,
+          'status': 'active',
+          'D.O.B': '',
+          'Qualification': [
+            {
+              'institution': '',
+              'courseStudied': '',
+              'certificateNo': '',
+              'year': '',
+            }
+          ],
+          'department': '',
+          'role': '',
+          'address': '',
+          'nextOfKin': '',
+          'nextOfKinMobile': '',
+          'nextOfKinMail': '',
+          'activityLog': [],
         });
         if (!mounted) return;
         // Pop the progress indicator
