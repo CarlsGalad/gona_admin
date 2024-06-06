@@ -47,12 +47,23 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
   Future<void> _toggleSuspendAdmin(String adminId) async {
     DocumentSnapshot adminSnapshot =
         await _firestore.collection('admin').doc(adminId).get();
-    String currentStatus = adminSnapshot.get('status' == 'active');
-    String newStatus = currentStatus == 'suspended' ? 'active' : 'suspended';
-    await _firestore
-        .collection('admin')
-        .doc(adminId)
-        .update({'status': newStatus});
+    Map<String, dynamic>? adminData =
+        adminSnapshot.data() as Map<String, dynamic>?;
+
+    if (adminData != null && adminData.containsKey('status')) {
+      String currentStatus = adminData['status'] as String;
+      String newStatus = currentStatus == 'suspended' ? 'active' : 'suspended';
+      await _firestore
+          .collection('admin')
+          .doc(adminId)
+          .update({'status': newStatus});
+    } else {
+      // If 'status' is not present, assume the current status is 'active'
+      await _firestore
+          .collection('admin')
+          .doc(adminId)
+          .update({'status': 'suspended'});
+    }
   }
 
   Future<void> _deleteAdmin(String adminId) async {
@@ -167,6 +178,13 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                       itemBuilder: (context, index) {
                         var admin =
                             admins[index].data() as Map<String, dynamic>;
+                        final name = admin['firsName'] ??
+                            '' + '' + admin['lastName'] ??
+                            '';
+                        final status = admin['status'] ?? 'active';
+                        final department = admin['department'] ?? '';
+                        final role = admin['role'] ?? '';
+                        final image = admin['imagePath'] ?? '';
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -177,25 +195,24 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                               leading: SizedBox(
                                 width: 50,
                                 child: ImageNetwork(
-                                  image: admin['imagePath'] ?? '',
+                                  image: image,
                                   width: 50,
                                   height: 50,
                                   borderRadius: BorderRadius.circular(45),
                                 ),
                               ),
-                              title: Text(admin['firstName'],
-                                  style: GoogleFonts.abel()),
-                              subtitle: Text(
-                                  '${admin['department'] ?? ''} - ${admin['role'] ?? ''}',
+                              title: Text(name, style: GoogleFonts.abel()),
+                              subtitle: Text('$department - $role',
                                   style: GoogleFonts.abel()),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: Icon(admin['status'] == 'suspended'
+                                    tooltip: 'Suspend/Unsuspend staff',
+                                    icon: Icon(status == 'suspended'
                                         ? Icons.play_arrow
                                         : Icons.pause),
-                                    color: admin['status'] == 'suspended'
+                                    color: status == 'suspended'
                                         ? Colors.green
                                         : Colors.orange,
                                     onPressed: () {
@@ -204,7 +221,8 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                                     },
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.delete),
+                                    tooltip: 'Erase data',
+                                    icon: const Icon(Icons.delete),
                                     color: Colors.red,
                                     onPressed: () {
                                       _showConfirmationDialog(
