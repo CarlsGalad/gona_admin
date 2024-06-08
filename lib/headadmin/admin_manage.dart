@@ -165,11 +165,20 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Name: ${_headAdmin!['firstName']}',
+                              Text(
+                                  'Name: ${_headAdmin!['firstName']} '
+                                  ' ${_headAdmin!['lastName']}',
                                   style: GoogleFonts.abel(fontSize: 16)),
                               Text('Email: ${_headAdmin!['email']}',
                                   style: GoogleFonts.abel(fontSize: 16)),
-                              // Add other head admin details as needed
+                              Text('Phone: ${_headAdmin!['mobile']}',
+                                  style: GoogleFonts.abel(fontSize: 16)),
+                              Text('Department: ${_headAdmin!['department']}',
+                                  style: GoogleFonts.abel(fontSize: 16)),
+                              Text('Role: ${_headAdmin!['role']}',
+                                  style: GoogleFonts.abel(fontSize: 16)),
+                              Text('Date of Birth: ${_headAdmin!['birthDate']}',
+                                  style: GoogleFonts.abel(fontSize: 16)),
                             ],
                           ),
                   ],
@@ -224,9 +233,11 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                                   borderRadius: BorderRadius.circular(45),
                                 ),
                               ),
-                              title: Text('$fistName $lastName',
-                                  style: GoogleFonts.abel()),
-                              subtitle: Text('$department - $role',
+                              title: Text(
+                                '$fistName $lastName',
+                                style: GoogleFonts.abel(fontSize: 16),
+                              ),
+                              subtitle: Text('$department - $role - $status',
                                   style: GoogleFonts.abel()),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -317,6 +328,8 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                             ],
                           ),
                           Text('Email: ${_selectedAdmin!['email']}',
+                              style: GoogleFonts.abel(fontSize: 16)),
+                          Text('Email: ${_selectedAdmin!['mobile']}',
                               style: GoogleFonts.abel(fontSize: 16)),
                           Text('Department: ${_selectedAdmin!['department']}',
                               style: GoogleFonts.abel(fontSize: 16)),
