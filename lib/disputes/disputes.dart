@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ManageDisputesScreen extends StatefulWidget {
   const ManageDisputesScreen({super.key});
@@ -70,7 +71,10 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
                   child: Container(
                     decoration: const BoxDecoration(color: Colors.grey),
                     child: ListTile(
-                      title: Text('Category: ${dispute['category']}'),
+                      title: Text(
+                        'Category: ${dispute['category']}',
+                        style: GoogleFonts.abel(fontSize: 16),
+                      ),
                       subtitle: FutureBuilder<DocumentSnapshot>(
                         future: FirebaseFirestore.instance
                             .collection('users')
@@ -83,10 +87,15 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
                           final userData =
                               userSnapshot.data!.data() as Map<String, dynamic>;
                           return Text(
-                              'Sender: ${userData['firstName']} ${userData['lastName']}');
+                            'Sender: ${userData['firstName']} ${userData['lastName']}',
+                            style: GoogleFonts.abel(fontSize: 16),
+                          );
                         },
                       ),
-                      trailing: Text('Status: ${dispute['status']}'),
+                      trailing: Text(
+                        'Status: ${dispute['status']}',
+                        style: GoogleFonts.abel(fontSize: 16),
+                      ),
                       onTap: () {
                         setState(
                           () {
@@ -114,46 +123,120 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
   }
 
   Widget _buildDisputeDetailsView() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Category: ${_selectedDispute!['category']}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            _selectedUserDetails == null
-                ? const LinearProgressIndicator()
-                : Text(
-                    'Sender: ${_selectedUserDetails!['firstName']} ${_selectedUserDetails!['lastName']}',
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-            const SizedBox(height: 10),
-            const Text(
-              'Details:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              '${_selectedDispute!['description']}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle settle dispute action
-                },
-                child: const Text('Settle Dispute'),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Category: ${_selectedDispute!['category']}',
+                  style: GoogleFonts.aboreto(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              const Divider(),
+              const SizedBox(height: 10),
+              _selectedUserDetails == null
+                  ? const LinearProgressIndicator()
+                  : Text(
+                      'Sender: ${_selectedUserDetails!['firstName']} ${_selectedUserDetails!['lastName']}',
+                      style: GoogleFonts.abel(fontSize: 16),
+                    ),
+              const SizedBox(height: 10),
+              Text(
+                'Details:',
+                style: GoogleFonts.aboreto(
+                    fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
+              const SizedBox(height: 5),
+              Text(
+                '${_selectedDispute!['description']}',
+                style: GoogleFonts.abel(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => _resolveDispute('refund'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
+                    child: Text(
+                      'Refund',
+                      style: GoogleFonts.abel(fontSize: 16),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _resolveDispute('replace'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ),
+                    child: Text(
+                      'Replace',
+                      style: GoogleFonts.abel(fontSize: 16),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _settleDispute,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),
+                    child: Text(
+                      'Settle',
+                      style: GoogleFonts.abel(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  // Function to update 'resolve' field
+  Future<void> _resolveDispute(String action) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('disputes')
+          .doc(_selectedDispute!.id)
+          .update({
+        'resolve': action,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Dispute resolved with $action action.')),
+      );
+      setState(() {
+        // Refresh the selected dispute to reflect the updated resolve field
+        _selectedDispute = null;
+        _selectedDisputeIndex = null;
+      });
+    } catch (error) {
+      print('Failed to resolve dispute: $error');
+    }
+  }
+
+  // Function to update 'status' field to 'settled'
+  Future<void> _settleDispute() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('disputes')
+          .doc(_selectedDispute!.id)
+          .update({
+        'status': 'settled',
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Dispute status set to settled.')),
+      );
+      setState(() {
+        // Refresh the selected dispute to reflect the updated status
+        _selectedDispute = null;
+        _selectedDisputeIndex = null;
+      });
+    } catch (error) {
+      print('Failed to settle dispute: $error');
+    }
   }
 }
