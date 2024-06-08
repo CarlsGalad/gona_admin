@@ -114,7 +114,9 @@ class OurUsersScreenState extends State<OurUsersScreen> {
             child: Container(
               decoration: const BoxDecoration(color: Colors.grey),
               child: ListTile(
-                title: Text('$firstName $lastName'),
+                title: Text('$firstName $lastName',
+                    style: GoogleFonts.aboreto(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 onTap: () {
                   setState(() {
                     _selectedUserIndex = index;
@@ -210,47 +212,44 @@ class OurUsersScreenState extends State<OurUsersScreen> {
     final String address = user['address'] ?? 'No address provided';
     final List<dynamic> purchaseHistory = user['purchase_history'] ?? [];
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (imagePath.isNotEmpty)
-              ImageNetwork(
-                image: imagePath,
-                width: 200,
-                height: 200,
-                fitWeb: BoxFitWeb.cover,
-                borderRadius: BorderRadius.circular(10),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (imagePath.isNotEmpty)
+                ImageNetwork(
+                  image: imagePath,
+                  width: 200,
+                  height: 200,
+                  fitWeb: BoxFitWeb.cover,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              const Divider(),
+              Text(
+                '$firstName $lastName',
+                style: GoogleFonts.aboreto(
+                    fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            Text(
-              '$firstName $lastName',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Email: $email',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Mobile: $mobile',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Address: $address',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              'Last 5 Purchases:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            _buildLastPurchases(purchaseHistory),
-          ],
+              Divider(),
+              const SizedBox(height: 10),
+              Text('Email: $email', style: GoogleFonts.abel(fontSize: 16)),
+              const SizedBox(height: 5),
+              Text('Mobile: $mobile', style: GoogleFonts.abel(fontSize: 16)),
+              const SizedBox(height: 5),
+              Text('Address: $address', style: GoogleFonts.abel(fontSize: 16)),
+              const SizedBox(height: 5),
+              Divider(),
+              Text('Last 5 Purchases:',
+                  style: GoogleFonts.aboreto(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Divider(),
+              const SizedBox(height: 10),
+              _buildLastPurchases(purchaseHistory),
+            ],
+          ),
         ),
       ),
     );
@@ -274,8 +273,10 @@ class OurUsersScreenState extends State<OurUsersScreen> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Total Amount: ₦${purchase['total_amount']}'),
-                Text('Order Date: $formattedDate'),
+                Text('Total Amount: ₦${purchase['total_amount']}',
+                    style: GoogleFonts.abel(fontSize: 16)),
+                Text('Order Date: $formattedDate',
+                    style: GoogleFonts.abel(fontSize: 16)),
               ],
             ),
           ),
