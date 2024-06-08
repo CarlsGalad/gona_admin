@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
 
 import 'model.dart';
@@ -15,40 +16,43 @@ class NewsDetailScreen extends StatefulWidget {
 class _NewsDetailScreenState extends State<NewsDetailScreen> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 40.0, top: 50),
-            child: Text(
-              widget.newsItem.title,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30),
+    return Container(
+      color: Colors.grey[300],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 40.0, top: 50),
+              child: Text(
+                widget.newsItem.title,
+                style: GoogleFonts.aboreto(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30),
+              ),
             ),
-          ),
-          ImageNetwork(
-            image: widget.newsItem.imageUrl,
-            height: 300,
-            width: 500,
-          ),
-          const SizedBox(height: 16.0),
-          Text(
-            'By ${widget.newsItem.author} • ${widget.newsItem.timePosted}',
-            style: const TextStyle(
-              color: Colors.grey,
+            ImageNetwork(
+              image: widget.newsItem.imageUrl,
+              height: 300,
+              width: 500,
             ),
-          ),
-          const SizedBox(height: 16.0),
-          Text(
-            widget.newsItem.content,
-            style: const TextStyle(fontSize: 16.0, color: Colors.white70),
-          ),
-        ],
+            const SizedBox(height: 16.0),
+            Text(
+              'By ${widget.newsItem.author} • ${widget.newsItem.timePosted}',
+              style: const TextStyle(
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              widget.newsItem.content,
+              style: GoogleFonts.abel(fontSize: 16.0, color: Colors.black),
+            ),
+          ],
+        ),
       ),
     );
   }
