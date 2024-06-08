@@ -79,8 +79,8 @@ class _SingUpPageState extends State<SingUpPage> {
           'mobile': mobileController.text,
           'userId': user.uid,
           'status': 'active',
-          'D.O.B': '',
-          'Qualification': [
+          'birthDate': '',
+          'qualification': [
             {
               'institution': '',
               'courseStudied': '',
