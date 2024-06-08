@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gona_admin/news/createnews.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
 
 import 'details.dart';
@@ -72,9 +73,12 @@ class NewsScreenState extends State<NewsScreen> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                            title: Text(newsItem.title),
+                            title: Text(newsItem.title,
+                                style: GoogleFonts.aboreto(fontSize: 18)),
                             subtitle: Text(
-                                'By ${newsItem.author} • ${newsItem.timePosted}'),
+                              'By ${newsItem.author} • ${newsItem.timePosted}',
+                              style: GoogleFonts.abel(fontSize: 16),
+                            ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () {
