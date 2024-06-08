@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
 
 class OurVendorsScreen extends StatefulWidget {
@@ -134,8 +135,12 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
             child: Container(
               decoration: const BoxDecoration(color: Colors.grey),
               child: ListTile(
-                title: Text(farmName),
-                subtitle: Text(ownersName),
+                title: Text(farmName,
+                    style: GoogleFonts.aboreto(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+                subtitle: Text(ownersName,
+                    style: GoogleFonts.abel(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 onTap: () {
                   setState(() {
                     _selectedVendorIndex = index;
@@ -237,61 +242,65 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
     final int totalEarnings = vendor['totalEarnings'] ?? 0;
     final int totalSales = vendor['totalSales'] ?? 0;
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (imagePath.isNotEmpty)
-              ImageNetwork(
-                image: imagePath,
-                width: 200,
-                height: 200,
-                borderRadius: BorderRadius.circular(45),
-              ),
-            Text(
-              farmName,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Owner: $ownersName',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Email: $email',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Mobile: $mobile',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Address: $address, $city, $country',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Total Earnings: ₦${totalEarnings.toString()}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Total Sales: ${totalSales.toString()}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Products:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            _buildProductsGridView(),
-          ],
+    return Scaffold(
+      backgroundColor: Colors.grey[300],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (imagePath.isNotEmpty)
+                ImageNetwork(
+                  image: imagePath,
+                  width: 200,
+                  height: 200,
+                  borderRadius: BorderRadius.circular(45),
+                ),
+              const Divider(),
+              Text(farmName,
+                  style: GoogleFonts.aboreto(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              const Divider(),
+              const SizedBox(height: 10),
+              Text('Owner: $ownersName',
+                  style: GoogleFonts.abel(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 5),
+              Text('Email: $email',
+                  style: GoogleFonts.abel(
+                    fontSize: 16,
+                  )),
+              const SizedBox(height: 5),
+              Text('Mobile: $mobile',
+                  style: GoogleFonts.abel(
+                    fontSize: 16,
+                  )),
+              const SizedBox(height: 5),
+              Text('Address: $address, $city, $country',
+                  style: GoogleFonts.abel(
+                    fontSize: 16,
+                  )),
+              const SizedBox(height: 5),
+              Text('Total Earnings: ₦${totalEarnings.toString()}',
+                  style: GoogleFonts.abel(
+                    fontSize: 16,
+                  )),
+              const SizedBox(height: 5),
+              Text('Total Sales: ${totalSales.toString()}',
+                  style: GoogleFonts.abel(
+                    fontSize: 16,
+                  )),
+              const SizedBox(height: 20),
+              const Divider(),
+              Text('Products:',
+                  style: GoogleFonts.aboreto(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              const Divider(),
+              const SizedBox(height: 10),
+              _buildProductsGridView(),
+            ],
+          ),
         ),
       ),
     );
@@ -340,26 +349,20 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  'Price: ₦${price.toString()}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                  ),
-                ),
-                Text(
-                  'Selling Method: $sellingMethod',
-                  style: const TextStyle(
-                    fontSize: 10,
-                  ),
-                ),
+                Text('Price: ₦${price.toString()}',
+                    style: GoogleFonts.abel(
+                      fontSize: 10,
+                    )),
+                Text('Selling Method: $sellingMethod',
+                    style: GoogleFonts.abel(
+                      fontSize: 10,
+                    )),
                 Row(
                   children: [
-                    Text(
-                      'Farming Year: ${farmingYear.toString()}',
-                      style: const TextStyle(
-                        fontSize: 10,
-                      ),
-                    ),
+                    Text('Farming Year: ${farmingYear.toString()}',
+                        style: GoogleFonts.abel(
+                          fontSize: 10,
+                        )),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () async {
