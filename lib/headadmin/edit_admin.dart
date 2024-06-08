@@ -16,9 +16,16 @@ class EditAdminDialogState extends State<EditAdminDialog> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
+  late TextEditingController _phoneController;
   late TextEditingController _departmentController;
   late TextEditingController _roleController;
   late TextEditingController _dobController;
+  late TextEditingController _addressController;
+  late TextEditingController _nextOfKinController;
+  late TextEditingController _nextOfKinMobileController;
+
+  late TextEditingController _nextOfKinMailController;
+
   late List<Map<String, String>> _qualifications;
 
   @override
@@ -29,8 +36,19 @@ class EditAdminDialogState extends State<EditAdminDialog> {
     _lastNameController =
         TextEditingController(text: widget.adminData?['lastName']);
     _emailController = TextEditingController(text: widget.adminData?['email']);
+    _phoneController = TextEditingController(text: widget.adminData?['mobile']);
     _dobController =
         TextEditingController(text: widget.adminData?['birthDate']);
+
+    _addressController =
+        TextEditingController(text: widget.adminData?['address']);
+    _nextOfKinController =
+        TextEditingController(text: widget.adminData?['nextOfKin']);
+    _nextOfKinMobileController =
+        TextEditingController(text: widget.adminData?['nextOfKinMobile']);
+
+    _nextOfKinMailController =
+        TextEditingController(text: widget.adminData?['nextOfKinMail']);
     _departmentController =
         TextEditingController(text: widget.adminData?['department']);
     _roleController = TextEditingController(text: widget.adminData?['role']);
@@ -47,6 +65,7 @@ class EditAdminDialogState extends State<EditAdminDialog> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _departmentController.dispose();
     _roleController.dispose();
     super.dispose();
@@ -68,9 +87,14 @@ class EditAdminDialogState extends State<EditAdminDialog> {
       'firstName': _firstNameController.text,
       'lastName': _lastNameController.text,
       'email': _emailController.text,
-      'birthDay': _dobController.text,
+      'phone': _phoneController.text,
+      'birthDate': _dobController.text,
       'department': _departmentController.text,
       'role': _roleController.text,
+      'address': _addressController.text,
+      'nextOfKin': _nextOfKinController.text,
+      'nextOfKinMobile': _nextOfKinMobileController.text,
+      'nextOfKinMail': _nextOfKinMailController.text,
       'qualification': _qualifications,
     };
 
@@ -118,6 +142,36 @@ class EditAdminDialogState extends State<EditAdminDialog> {
               controller: _emailController,
               decoration: InputDecoration(
                   labelText: 'Email', labelStyle: GoogleFonts.oswald()),
+            ),
+            TextField(
+              style: GoogleFonts.abel(fontSize: 16),
+              controller: _phoneController,
+              decoration: InputDecoration(
+                  labelText: 'Phone', labelStyle: GoogleFonts.oswald()),
+            ),
+            TextField(
+              style: GoogleFonts.abel(fontSize: 16),
+              controller: _addressController,
+              decoration: InputDecoration(
+                  labelText: 'Address', labelStyle: GoogleFonts.oswald()),
+            ),
+            TextField(
+              style: GoogleFonts.abel(fontSize: 16),
+              controller: _nextOfKinController,
+              decoration: InputDecoration(
+                  labelText: 'Next of Kin', labelStyle: GoogleFonts.oswald()),
+            ),
+            TextField(
+              style: GoogleFonts.abel(fontSize: 16),
+              controller: _nextOfKinMobileController,
+              decoration: InputDecoration(
+                  labelText: 'Kin Mail', labelStyle: GoogleFonts.oswald()),
+            ),
+            TextField(
+              style: GoogleFonts.abel(fontSize: 16),
+              controller: _nextOfKinMobileController,
+              decoration: InputDecoration(
+                  labelText: 'Kin Mobile', labelStyle: GoogleFonts.oswald()),
             ),
             TextField(
               controller: _dobController,
