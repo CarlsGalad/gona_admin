@@ -3,6 +3,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AdminService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Method to log activity
+  Future<void> logActivity(
+      String adminId, String action, String details) async {
+    try {
+      await _firestore
+          .collection('admin')
+          .doc(adminId)
+          .collection('activityLog')
+          .add({
+        'timestamp': FieldValue.serverTimestamp(),
+        'action': action,
+        'details': details,
+      });
+    } catch (e) {
+      print('Error logging activity: $e');
+    }
+  }
+
   Future<Map<String, dynamic>?> getCurrentAdminData(String adminId) async {
     try {
       DocumentSnapshot doc =
