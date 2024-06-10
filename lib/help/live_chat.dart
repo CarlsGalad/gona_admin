@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class ChatPlaceholderWidget extends StatefulWidget {
-  const ChatPlaceholderWidget({super.key});
+class ChatWidget extends StatefulWidget {
+  const ChatWidget({super.key});
 
   @override
-  ChatPlaceholderWidgetState createState() => ChatPlaceholderWidgetState();
+  ChatWidgetState createState() => ChatWidgetState();
 }
 
-class ChatPlaceholderWidgetState extends State<ChatPlaceholderWidget> {
+class ChatWidgetState extends State<ChatWidget> {
   String? selectedChatId;
   String? selectedChatTitle;
   final TextEditingController _messageController = TextEditingController();
