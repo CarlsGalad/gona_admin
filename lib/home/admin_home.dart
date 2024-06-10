@@ -88,6 +88,12 @@ class _AdminHomeState extends State<AdminHome> {
             await _searchService.search(searchText);
         Navigator.pop(context); // Remove the loading indicator
 
+        // Log the search activity
+        if (adminId != null) {
+          await AdminService()
+              .logActivity(adminId!, 'Search', 'Searched for "$searchText"');
+        }
+
         if (results.isEmpty) {
           Navigator.push(
             context,
@@ -108,6 +114,12 @@ class _AdminHomeState extends State<AdminHome> {
         Navigator.pop(context); // Remove the loading indicator
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('An error occurred during the search.')));
+
+        // Log the search error
+        if (adminId != null) {
+          await AdminService().logActivity(
+              adminId!, 'Search Error', 'Failed search for "$searchText"');
+        }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -123,35 +135,80 @@ class _AdminHomeState extends State<AdminHome> {
       Uint8List? fileBytes = result.files.first.bytes;
       if (fileBytes != null) {
         // Upload the image to Firebase Storage
-        Reference ref = FirebaseStorage.instance
-            .ref()
-            .child('admin_images/${adminId}_profile.jpg');
+        try {
+          Reference ref = FirebaseStorage.instance
+              .ref()
+              .child('admin_images/${adminId}_profile.jpg');
 
-        UploadTask uploadTask = ref.putData(fileBytes);
-        TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+          UploadTask uploadTask = ref.putData(fileBytes);
+          TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
 
-        // Get the image URL and update the admin data
-        String imageUrl = await snapshot.ref.getDownloadURL();
-        await AdminService().updateAdminImage(adminId!, imageUrl);
+          // Get the image URL and update the admin data
+          String imageUrl = await snapshot.ref.getDownloadURL();
+          await AdminService().updateAdminImage(adminId!, imageUrl);
 
-        // Show a snackbar or toast message to indicate success
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Profile image updated successfully'),
-        ));
+          // Show a snackbar or toast message to indicate success
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Profile image updated successfully'),
+          ));
+
+          // Log the image upload activity
+          if (adminId != null) {
+            await AdminService().logActivity(
+                adminId!, 'Profile Image Upload', 'Uploaded new profile image');
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Failed to upload image.')));
+
+          // Log the image upload error
+          if (adminId != null) {
+            await AdminService().logActivity(adminId!,
+                'Profile Image Upload Error', 'Failed to upload profile image');
+          }
+        }
       }
+    }
+  }
+
+  String _getPageNameByIndex(int index) {
+    switch (index) {
+      case 0:
+        return 'Home';
+      case 1:
+        return 'Live Chat';
+      case 2:
+        return 'Gona News';
+      case 3:
+        return 'Manage Categories';
+      case 4:
+        return 'Manage Loans';
+      case 5:
+        return 'Marketing';
+      case 6:
+        return 'Our Vendors';
+      case 7:
+        return 'Users';
+      case 8:
+        return 'Manage Disputes';
+      case 9:
+        return 'Admin Management';
+      default:
+        return 'Unknown';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     Widget screen;
-
+    // Get the user's department, default to 'HomeScreen' if not available
+    String department = adminData?['department'] ?? 'HomeScreen';
     switch (_selectedIndex) {
       case 0:
         screen = const HomeScreen();
         break;
       case 1:
-        screen = const ChatPlaceholderWidget();
+        screen = const ChatWidget();
         break;
       case 2:
         screen = const NewsScreen();
@@ -172,7 +229,7 @@ class _AdminHomeState extends State<AdminHome> {
         screen = const ManageDisputesScreen();
         break;
       case 9:
-        screen =  const AdminManagementScreen();
+        screen = const AdminManagementScreen();
         break;
       default:
         screen = Container(); // Add default case or handle error
@@ -251,10 +308,14 @@ class _AdminHomeState extends State<AdminHome> {
                 tooltip: 'Payment Manangement',
                 color: Colors.grey,
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PaymentManagementScreen()));
+                  if (department == 'Admin' ||
+                      department == 'Finance and Accounting') {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const PaymentManagementScreen()));
+                  }
                 },
                 icon: const Icon(Icons.wallet)),
           ),
@@ -264,10 +325,13 @@ class _AdminHomeState extends State<AdminHome> {
                 tooltip: 'Transaction History',
                 color: Colors.grey,
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const TransactionsScreen()));
+                  if (department == 'Admin' ||
+                      department == 'Finance and Accounting') {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const TransactionsScreen()));
+                  }
                 },
                 icon: const Icon(Icons.history)),
           ),
@@ -525,6 +589,13 @@ class _AdminHomeState extends State<AdminHome> {
                             setState(() {
                               _selectedIndex = index;
                             });
+
+                            // Log the navigation action
+                            if (adminId != null) {
+                              String pageName = _getPageNameByIndex(index);
+                              AdminService().logActivity(adminId!, 'Navigation',
+                                  'Navigated to $pageName');
+                            }
                           },
                           labelType: NavigationRailLabelType.all,
                           destinations: const <NavigationRailDestination>[
@@ -588,7 +659,10 @@ class _AdminHomeState extends State<AdminHome> {
     );
   }
 
-  void _logout() {
+  void _logout() async {
+    if (adminId != null) {
+      await AdminService().logActivity(adminId!, 'Logout', 'Admin logged out');
+    }
     FirebaseAuth.instance.signOut();
     // Navigate to login screen or any other action after logout
   }
