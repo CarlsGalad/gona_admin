@@ -529,8 +529,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                           horizontal: 200.0, vertical: 8),
                       child: Container(
                         decoration: BoxDecoration(
+                            color: Colors.black38,
                             borderRadius: BorderRadius.circular(6)),
-                        color: Colors.black38,
                         child: ListTile(
                           title: Text(
                             result['name'] ??
