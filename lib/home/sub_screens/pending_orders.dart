@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -59,8 +60,14 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
                   height: 70,
                   color: Colors.white,
                   child: ListTile(
-                    title: Text('Order Id ${order.id}'),
-                    trailing: Text('Placed $timeAgo'),
+                    title: Text(
+                      'Order Id ${order.id}',
+                      style: GoogleFonts.aboreto(),
+                    ),
+                    trailing: Text(
+                      'Placed $timeAgo',
+                      style: GoogleFonts.abel(),
+                    ),
                     onTap: () {
                       setState(() {
                         _selectedOrder = order;
@@ -86,9 +93,12 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
               borderRadius: BorderRadius.circular(10),
               color: Colors.white,
             ),
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Please select an order'),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Please select an order',
+                style: GoogleFonts.abel(),
+              ),
             ),
           ),
         ),
@@ -107,50 +117,98 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
           children: [
             Text(
               'Order ${order['order_id']}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.aboreto(
+                  fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'Order Details:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style:
+                  GoogleFonts.abel(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: orderItems.length,
-              itemBuilder: (context, index) {
-                final item = orderItems[index] as Map<String, dynamic>;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: orderItems.length,
+                  itemBuilder: (context, index) {
+                    final item = orderItems[index] as Map<String, dynamic>;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Item ${index + 1}: ${item['name']}',
+                          style: GoogleFonts.abel(fontWeight: FontWeight.bold),
+                        ),
+                        Text('Price: ${item['price']}',
+                            style: GoogleFonts.abel()),
+                        Text('Quantity: ${item['quantity']}',
+                            style: GoogleFonts.abel()),
+                        const Divider(),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
                   children: [
                     Text(
-                      'Item ${index + 1}: ${item['name']}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      'Shipping Information:',
+                      style: GoogleFonts.aboreto(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    Text('Price: ${item['price']}'),
-                    Text('Quantity: ${item['quantity']}'),
-                    const Divider(),
+                    Divider(),
+                    Text(
+                      'Name: ${shippingInfo['name']}',
+                      style: GoogleFonts.abel(),
+                    ),
+                    Text(
+                      'Address: ${shippingInfo['address']}, ${shippingInfo['city']}, ${shippingInfo['state']}',
+                      style: GoogleFonts.abel(),
+                    ),
+                    Text(
+                      'Contact Number: ${shippingInfo['contactNumber']}',
+                      style: GoogleFonts.abel(),
+                    ),
                   ],
-                );
-              },
+                ),
+              ),
             ),
-            const Text(
-              'Shipping Information:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Text('Name: ${shippingInfo['name']}'),
-            Text(
-                'Address: ${shippingInfo['address']}, ${shippingInfo['city']}, ${shippingInfo['state']}'),
-            Text('Contact Number: ${shippingInfo['contactNumber']}'),
             // Display order status
             const SizedBox(height: 10),
-            const Text(
-              'Order Status:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Order Status:',
+                      style: GoogleFonts.aboreto(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const Divider(),
+                    Text('Placed: ${orderStatus['placed']}',
+                        style: GoogleFonts.abel()),
+                    Text('Order Date: ${_formatTimestamp(order['order_date'])}',
+                        style: GoogleFonts.abel()),
+                    Text('Total Amount: ${order['total_amount']}',
+                        style: GoogleFonts.abel()),
+                  ],
+                ),
+              ),
             ),
-            Text('Placed: ${orderStatus['placed']}'),
-            Text('Order Date: ${_formatTimestamp(order['order_date'])}'),
-            Text('Total Amount: ${order['total_amount']}'),
           ],
         ),
       ),
