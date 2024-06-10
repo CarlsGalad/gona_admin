@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MarketingScreen extends StatefulWidget {
@@ -14,9 +15,12 @@ class MarketingScreenState extends State<MarketingScreen> {
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _keyController = TextEditingController();
   final TextEditingController _valueController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _imageUrlsController = TextEditingController();
 
   final Map<String, String> _dataFields = {};
   String? selectedTopic;
+  String? selectedUserGroup;
   DocumentSnapshot? _selectedNotification;
 
   @override
@@ -25,14 +29,16 @@ class MarketingScreenState extends State<MarketingScreen> {
     _messageController.dispose();
     _keyController.dispose();
     _valueController.dispose();
+    _emailController.dispose();
+    _imageUrlsController.dispose();
     super.dispose();
   }
 
   Future<void> sendNotification(
       String title, String message, Map<String, String> data) async {
-    if (selectedTopic == null) {
+    if (selectedTopic == null || selectedUserGroup == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a topic')),
+        const SnackBar(content: Text('Please select a topic and user group')),
       );
       return;
     }
@@ -42,6 +48,7 @@ class MarketingScreenState extends State<MarketingScreen> {
       'title': title,
       'message': message,
       'topic': selectedTopic,
+      'user_group': selectedUserGroup,
       'data': data,
       'timestamp': FieldValue.serverTimestamp(),
     });
@@ -49,6 +56,33 @@ class MarketingScreenState extends State<MarketingScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Notification sent successfully')),
     );
+  }
+
+  Future<void> sendEmailWithImages(String email, String title, String message,
+      List<String> imageUrls) async {
+    final emailToSend = Email(
+      body: '''
+      <h1>$title</h1>
+      <p>$message</p>
+      ${imageUrls.map((url) => '<img src="$url" style="width:100px;height:auto;" />').join()}
+      <br>
+      <a href="yourapp://home">Open App</a>
+      ''',
+      subject: title,
+      recipients: [email],
+      isHTML: true,
+    );
+
+    try {
+      await FlutterEmailSender.send(emailToSend);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email sent successfully')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send email: $error')),
+      );
+    }
   }
 
   void _addDataField() {
@@ -59,6 +93,16 @@ class MarketingScreenState extends State<MarketingScreen> {
         _valueController.clear();
       });
     }
+  }
+
+  void _clearFields() {
+    setState(() {
+      _titleController.clear();
+      _messageController.clear();
+      _keyController.clear();
+      _valueController.clear();
+      _dataFields.clear();
+    });
   }
 
   @override
@@ -118,6 +162,31 @@ class MarketingScreenState extends State<MarketingScreen> {
                           ),
                         ],
                       ),
+                      DropdownButton<String>(
+                        style: GoogleFonts.abel(color: Colors.black),
+                        value: selectedUserGroup,
+                        hint: Text(
+                          'Select User Group',
+                          style: GoogleFonts.abel(fontSize: 16),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedUserGroup = value;
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        dropdownColor: Colors.deepPurpleAccent,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'vendors',
+                            child: Text('Vendors', style: GoogleFonts.abel()),
+                          ),
+                          DropdownMenuItem(
+                            value: 'customers',
+                            child: Text('Customers', style: GoogleFonts.abel()),
+                          ),
+                        ],
+                      ),
                       TextField(
                         controller: _titleController,
                         decoration: InputDecoration(
@@ -127,6 +196,18 @@ class MarketingScreenState extends State<MarketingScreen> {
                         controller: _messageController,
                         decoration: InputDecoration(
                             labelText: 'Message',
+                            labelStyle: GoogleFonts.abel()),
+                      ),
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                            labelText: 'Email (Optional)',
+                            labelStyle: GoogleFonts.abel()),
+                      ),
+                      TextField(
+                        controller: _imageUrlsController,
+                        decoration: InputDecoration(
+                            labelText: 'Image URLs (Comma separated)',
                             labelStyle: GoogleFonts.abel()),
                       ),
                       Row(
@@ -152,13 +233,9 @@ class MarketingScreenState extends State<MarketingScreen> {
                             ),
                           ),
                           IconButton(
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    WidgetStateProperty.resolveWith(
-                                        (callback) => Colors.green)),
                             icon: const Icon(Icons.add),
                             onPressed: _addDataField,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ],
                       ),
@@ -176,16 +253,39 @@ class MarketingScreenState extends State<MarketingScreen> {
                           },
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          sendNotification(
-                            _titleController.text,
-                            _messageController.text,
-                            _dataFields,
-                          );
-                        },
-                        child: Text('Send Notification',
-                            style: GoogleFonts.abel()),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              sendNotification(
+                                _titleController.text,
+                                _messageController.text,
+                                _dataFields,
+                              );
+
+                              if (_emailController.text.isNotEmpty) {
+                                sendEmailWithImages(
+                                  _emailController.text,
+                                  _titleController.text,
+                                  _messageController.text,
+                                  _imageUrlsController.text.split(','),
+                                );
+                              }
+
+                              _clearFields();
+                            },
+                            child: Text('Send Notification',
+                                style: GoogleFonts.abel()),
+                          ),
+                          const SizedBox(width: 20),
+                          ElevatedButton(
+                            onPressed: _clearFields,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey, // Background color
+                            ),
+                            child: Text('Clear', style: GoogleFonts.abel()),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -261,6 +361,11 @@ class MarketingScreenState extends State<MarketingScreen> {
               'Topic: ${_selectedNotification!['topic']}',
               style: const TextStyle(fontSize: 16),
             ),
+            const SizedBox(height: 10),
+            Text(
+              'User Group: ${_selectedNotification!['user_group']}',
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -276,3 +381,9 @@ class MarketingScreenState extends State<MarketingScreen> {
     );
   }
 }
+
+Email(
+    {required String body,
+    required String subject,
+    required List<String> recipients,
+    required bool isHTML}) {}
