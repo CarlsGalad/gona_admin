@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
+
+import '../services/admin_service.dart';
 
 class OurVendorsScreen extends StatefulWidget {
   const OurVendorsScreen({super.key});
@@ -15,6 +18,8 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
   int? _selectedVendorIndex;
   List<DocumentSnapshot> _vendors = [];
   List<DocumentSnapshot> _vendorItems = [];
+
+  String? cUser = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -62,6 +67,10 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
       _selectedVendorIndex = null;
       _vendorItems = [];
     });
+    // Log vendor deletion activity
+    final vendorId = vendor.id;
+    AdminService().logActivity(
+        cUser!, 'Vendor Deletion', 'Deleted vendor with ID: $vendorId');
   }
 
   Future<void> _deleteItem(int index) async {
@@ -84,6 +93,10 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
     setState(() {
       _vendorItems.removeAt(index);
     });
+    // Log item deletion activity
+    final itemId = item.id;
+    AdminService()
+        .logActivity(cUser!, 'Item Deletion', 'Deleted item with ID: $itemId');
   }
 
   @override
@@ -426,5 +439,10 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
             : 'lifted suspension'),
       ),
     );
+
+    // Log vendor suspension activity
+    final action = newStatus == 'suspended' ? 'Suspended' : 'Lifted Suspension';
+    AdminService().logActivity(
+        cUser!, 'Vendor Suspension', '$action vendor with ID: $vendorId');
   }
 }
