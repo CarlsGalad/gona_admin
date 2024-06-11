@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gona_admin/services/admin_service.dart'; // Import the AdminService
 
 class ChatWidget extends StatefulWidget {
   const ChatWidget({super.key});
@@ -28,7 +30,6 @@ class ChatWidgetState extends State<ChatWidget> {
       userNames[user.id] = "${user['firstName']} ${user['lastName']}";
     }
 
-    // Fetch farms from the 'farms' collection
     final farmsSnapshot =
         await FirebaseFirestore.instance.collection('farms').get();
     for (var farm in farmsSnapshot.docs) {
@@ -38,6 +39,16 @@ class ChatWidgetState extends State<ChatWidget> {
     }
 
     return userNames;
+  }
+
+  Future<void> _logChatSelection(String userId, String chatTitle) async {
+    final actionDetails = 'Selected chat: $chatTitle';
+    AdminService().logActivity(userId, 'Select Chat', actionDetails);
+  }
+
+  Future<void> _logMessageSending(String userId) async {
+    final actionDetails = 'Sent message in chat: $selectedChatTitle';
+    AdminService().logActivity(userId, 'Send Message', actionDetails);
   }
 
   @override
@@ -122,6 +133,12 @@ class ChatWidgetState extends State<ChatWidget> {
                                               selectedChatId = chat.id;
                                               selectedChatTitle = chat['title'];
                                             });
+                                            // Log chat selection
+                                            final userId = FirebaseAuth.instance
+                                                    .currentUser?.uid ??
+                                                '';
+                                            _logChatSelection(
+                                                userId, chat['title']);
                                           },
                                         ),
                                       ),
@@ -229,6 +246,11 @@ class ChatWidgetState extends State<ChatWidget> {
                                       'timestamp': FieldValue.serverTimestamp(),
                                     });
                                     _messageController.clear();
+                                    // Log message sending
+                                    final userId = FirebaseAuth
+                                            .instance.currentUser?.uid ??
+                                        '';
+                                    _logMessageSending(userId);
                                   },
                                 ),
                               ],

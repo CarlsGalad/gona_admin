@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gona_admin/services/admin_service.dart';
 
 class MarketingScreen extends StatefulWidget {
   const MarketingScreen({super.key});
@@ -23,6 +25,8 @@ class MarketingScreenState extends State<MarketingScreen> {
   String? selectedUserGroup;
   DocumentSnapshot? _selectedNotification;
 
+  String? adminId = FirebaseAuth.instance.currentUser!.uid;
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -41,6 +45,12 @@ class MarketingScreenState extends State<MarketingScreen> {
         const SnackBar(content: Text('Please select a topic and user group')),
       );
       return;
+    }
+
+    // Log activity before sending notification
+    if (adminId != null) {
+      await AdminService().logActivity(adminId!, 'Send Notification',
+          'Sent notification with title "$title" to topic "$selectedTopic" and user group "$selectedUserGroup"');
     }
 
     // Sending notification to a topic
@@ -74,6 +84,12 @@ class MarketingScreenState extends State<MarketingScreen> {
     );
 
     try {
+      // Log activity before sending email
+      if (adminId != null) {
+        await AdminService().logActivity(adminId!, 'Send Email',
+            'Sent email with title "$title" to recipient "$email"');
+      }
+
       await FlutterEmailSender.send(emailToSend);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Email sent successfully')),
@@ -89,6 +105,13 @@ class MarketingScreenState extends State<MarketingScreen> {
     if (_keyController.text.isNotEmpty && _valueController.text.isNotEmpty) {
       setState(() {
         _dataFields[_keyController.text] = _valueController.text;
+
+        // Log activity for adding a data field
+        if (adminId != null) {
+          AdminService().logActivity(adminId!, 'Add Data Field',
+              'Added data field "${_keyController.text}" with value "${_valueController.text}"');
+        }
+
         _keyController.clear();
         _valueController.clear();
       });
@@ -102,6 +125,12 @@ class MarketingScreenState extends State<MarketingScreen> {
       _keyController.clear();
       _valueController.clear();
       _dataFields.clear();
+
+      // Log activity for clearing fields
+      if (adminId != null) {
+        AdminService().logActivity(adminId!, 'Clear Fields',
+            'Cleared all input fields and data fields');
+      }
     });
   }
 
@@ -138,6 +167,12 @@ class MarketingScreenState extends State<MarketingScreen> {
                         onChanged: (value) {
                           setState(() {
                             selectedTopic = value;
+
+                            // Log activity for selecting a topic
+                            if (adminId != null && value != null) {
+                              AdminService().logActivity(adminId!,
+                                  'Select Topic', 'Selected topic "$value"');
+                            }
                           });
                         },
                         borderRadius: BorderRadius.circular(10),
@@ -172,6 +207,14 @@ class MarketingScreenState extends State<MarketingScreen> {
                         onChanged: (value) {
                           setState(() {
                             selectedUserGroup = value;
+
+                            // Log activity for selecting a user group
+                            if (adminId != null && value != null) {
+                              AdminService().logActivity(
+                                  adminId!,
+                                  'Select User Group',
+                                  'Selected user group "$value"');
+                            }
                           });
                         },
                         borderRadius: BorderRadius.circular(10),

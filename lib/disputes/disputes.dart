@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gona_admin/services/admin_service.dart'; // Import the AdminService
 
 class ManageDisputesScreen extends StatefulWidget {
   const ManageDisputesScreen({super.key});
@@ -13,6 +15,8 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
   int? _selectedDisputeIndex;
   DocumentSnapshot? _selectedDispute;
   Map<String, dynamic>? _selectedUserDetails;
+
+  String? adminId = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +108,12 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
                             _fetchUserDetails(dispute['userId']);
                           },
                         );
+
+                        // Log the action of viewing a dispute
+                        if (adminId != null) {
+                          AdminService().logActivity(adminId!, 'View Dispute',
+                              'Viewed details of dispute with ID "${dispute.id}"');
+                        }
                       },
                     ),
                   ),
@@ -205,9 +215,17 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
           .update({
         'resolve': action,
       });
+
+      // Log the action of resolving a dispute
+      if (adminId != null) {
+        await AdminService().logActivity(adminId!, 'Resolve Dispute',
+            'Resolved dispute with ID "${_selectedDispute!.id}" using "$action" action');
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Dispute resolved with $action action.')),
       );
+
       setState(() {
         // Refresh the selected dispute to reflect the updated resolve field
         _selectedDispute = null;
@@ -227,9 +245,17 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
           .update({
         'status': 'settled',
       });
+
+      // Log the action of settling a dispute
+      if (adminId != null) {
+        await AdminService().logActivity(adminId!, 'Settle Dispute',
+            'Settled dispute with ID "${_selectedDispute!.id}"');
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Dispute status set to settled.')),
       );
+
       setState(() {
         // Refresh the selected dispute to reflect the updated status
         _selectedDispute = null;

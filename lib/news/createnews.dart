@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gona_admin/services/admin_service.dart'; // Import the AdminService
 
 class CreateNews extends StatefulWidget {
   const CreateNews({super.key});
@@ -41,7 +42,6 @@ class CreateNewsState extends State<CreateNews> {
     final User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       // Handle the case where the user is not signed in
-
       return;
     }
 
@@ -77,6 +77,10 @@ class CreateNewsState extends State<CreateNews> {
     };
 
     await FirebaseFirestore.instance.collection('news').add(newsData);
+
+    // Log the action of adding news
+    final actionDetails = 'Added news article: ${_titleController.text}';
+    AdminService().logActivity(userId, 'Add News', actionDetails);
 
     // Clear the input fields and image after adding news
     _titleController.clear();

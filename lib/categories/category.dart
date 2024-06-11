@@ -1,11 +1,11 @@
 import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:image_network/image_network.dart';
+import '../services/admin_service.dart';
 
 class ManageCategoryScreen extends StatefulWidget {
   const ManageCategoryScreen({super.key});
@@ -19,10 +19,15 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
   List<DocumentSnapshot> _categories = [];
   PlatformFile? _imageFile;
 
+  late AdminService _adminService;
+
+  String? adminId = FirebaseAuth.instance.currentUser!.uid;
+
   @override
   void initState() {
     super.initState();
     _fetchCategories();
+    _adminService = AdminService(); // Initialize the AdminService instance
   }
 
   Future<void> _fetchCategories() async {
@@ -56,9 +61,7 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
     final storage = FirebaseStorage.instance;
     final timeStamp = DateTime.now().millisecondsSinceEpoch;
     final ref = storage.ref().child('categoryimages/$timeStamp.jpg');
-    await ref.putData(
-      Uint8List.fromList(_imageFile!.bytes!),
-    );
+    await ref.putData(Uint8List.fromList(_imageFile!.bytes!));
     final imageUrl = await ref.getDownloadURL();
 
     final newCategory =
@@ -70,6 +73,13 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
     for (String subcategory in subcategories) {
       await newCategory.collection('Subcategories').add({'name': subcategory});
     }
+
+    // Log the activity
+    await _adminService.logActivity(
+      adminId!,
+      'Added a new category',
+      'Added $categoryName and subcategories $subcategories with an image $imageUrl',
+    );
 
     // Clear the image after adding category
     setState(() {
@@ -91,6 +101,13 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
         .collection('Subcategories')
         .add({'name': subcategoryName});
 
+    // Log the activity
+    await _adminService.logActivity(
+      adminId!,
+      'Added a Subcategory',
+      'category_id $selectedCategory.id subcategory_name $subcategoryName',
+    );
+
     // Refresh the UI to reflect the new subcategory
     setState(() {});
   }
@@ -108,6 +125,13 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
         .doc(subcategoryId)
         .update({'name': newName});
 
+    // Log the activity
+    await _adminService.logActivity(
+      adminId!,
+      'Edited a subcategory',
+      'category_id ${selectedCategory.id} subcategory id $subcategoryId the new name is $newName',
+    );
+
     // Refresh the UI to reflect the edited subcategory
     setState(() {});
   }
@@ -124,6 +148,13 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
         .collection('Subcategories')
         .doc(subcategoryId)
         .delete();
+
+    // Log the activity
+    await _adminService.logActivity(
+      adminId!,
+      'Deleted a subcategory',
+      'category id $selectedCategory.id subcategory_id $subcategoryId',
+    );
 
     // Refresh the UI to reflect the deleted subcategory
     setState(() {});
@@ -237,8 +268,6 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
                           },
                         ),
                       ),
-                      // ImageNetwork(
-                      //     image: category['imagePath'], height: 100, width: 200),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -403,9 +432,7 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.add),
-            onPressed:
-                // Add new subcategory action
-                _showAddSubcategoryDialog,
+            onPressed: _showAddSubcategoryDialog,
           ),
         );
       },

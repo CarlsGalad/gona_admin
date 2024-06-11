@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:gona_admin/home/topitems.dart';
+import 'package:gona_admin/home/sub_screens/delivered_orders.dart';
+import 'package:gona_admin/home/sub_screens/pending_orders.dart';
+import 'package:gona_admin/home/sub_screens/processed_orders.dart';
+import 'package:gona_admin/home/sub_screens/shipped_orders.dart';
+import 'package:gona_admin/services/admin_service.dart'; // Import the AdminService
 
 import 'daily_chart.dart';
 import 'delivered_orders.dart';
@@ -9,10 +13,6 @@ import 'pending_orders.dart';
 import 'proccessed_order.dart';
 import 'sales_overview.dart';
 import 'shipped_orders.dart';
-import 'sub_screens/delivered_orders.dart';
-import 'sub_screens/pending_orders.dart';
-import 'sub_screens/processed_orders.dart';
-import 'sub_screens/shipped_orders.dart';
 import 'top_locations.dart';
 import 'total_sales.dart';
 import 'vendors_tile.dart';
@@ -25,6 +25,22 @@ class MainHome extends StatefulWidget {
 }
 
 class _MainHomeState extends State<MainHome> {
+  String? adminId =
+      'admin_id_placeholder'; // Replace with actual admin ID logic
+
+  // Log the activity when a tile is tapped
+  Future<void> _logTileTap(
+      String tileName, Widget Function() navigateTo) async {
+    if (adminId != null) {
+      await AdminService()
+          .logActivity(adminId!, 'Navigation', 'Navigated to $tileName');
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => navigateTo()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -43,7 +59,7 @@ class _MainHomeState extends State<MainHome> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //first row
+                    // First Row
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -53,49 +69,32 @@ class _MainHomeState extends State<MainHome> {
                               children: [
                                 const TotalSalesTile(),
                                 GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const PendingOrderScreen()));
-                                    },
-                                    child: const PendingOrderTile()),
+                                  onTap: () => _logTileTap('Pending Orders',
+                                      () => const PendingOrderScreen()),
+                                  child: const PendingOrderTile(),
+                                ),
                               ],
                             ),
-                            //Second Row
+                            // Second Row
                             Row(
                               children: [
                                 GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ProcessedOrderScreen()));
-                                    },
-                                    child: const ProcessedCountTile()),
+                                  onTap: () => _logTileTap('Processed Orders',
+                                      () => const ProcessedOrderScreen()),
+                                  child: const ProcessedCountTile(),
+                                ),
                                 GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ShippedOrderScreen()));
-                                    },
-                                    child: const ShippedOdersCount()),
+                                  onTap: () => _logTileTap('Shipped Orders',
+                                      () => const ShippedOrderScreen()),
+                                  child: const ShippedOdersCount(),
+                                ),
                                 GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const DeliveredOrderScreen()));
-                                    },
-                                    child: const DeliveredCountTitle()),
+                                  onTap: () => _logTileTap('Delivered Orders',
+                                      () => const DeliveredOrderScreen()),
+                                  child: const DeliveredCountTitle(),
+                                ),
                               ],
                             ),
-
                             // Third Row
                             const Row(
                               children: [

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
-
+import 'package:gona_admin/services/admin_service.dart'; // Import the AdminService
 import 'edit_admin.dart';
 
 class AdminManagementScreen extends StatefulWidget {
@@ -19,6 +19,8 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
   DocumentSnapshot? _selectedAdmin;
   DocumentSnapshot? _headAdmin;
   bool isProcessing = false;
+
+  String? adminId = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -59,17 +61,33 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
           .collection('admin')
           .doc(adminId)
           .update({'status': newStatus});
+
+      // Log the action of suspending/unsuspending an admin
+      if (adminId != null) {
+        String action = newStatus == 'suspended' ? 'Suspended' : 'Unsuspended';
+        AdminService().logActivity(adminId, action, 'Admin ID: $adminId');
+      }
     } else {
       // If 'status' is not present, assume the current status is 'active'
       await _firestore
           .collection('admin')
           .doc(adminId)
           .update({'status': 'suspended'});
+
+      // Log the action of suspending an admin
+      if (adminId != null) {
+        AdminService().logActivity(adminId, 'Suspended', 'Admin ID: $adminId');
+      }
     }
   }
 
   Future<void> _deleteAdmin(String adminId) async {
     await _firestore.collection('admin').doc(adminId).delete();
+
+    // Log the action of deleting an admin
+    if (adminId != null) {
+      AdminService().logActivity(adminId, 'Deleted', 'Admin ID: $adminId');
+    }
   }
 
   Future<void> _showConfirmationDialog(String adminId, String action) async {
@@ -272,6 +290,13 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
                                 setState(() {
                                   _selectedAdmin = adminDetails;
                                 });
+                                // Log the action of viewing a dispute
+                                if (adminId != null) {
+                                  AdminService().logActivity(
+                                      adminId!,
+                                      'View Staff details',
+                                      'Viewed details of dispute with ID "${_selectedAdmin!.id}"');
+                                }
                               },
                             ),
                           ),
