@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gona_admin/user/insights.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
 import 'package:intl/intl.dart';
+
+import '../services/admin_service.dart';
 
 class OurUsersScreen extends StatefulWidget {
   const OurUsersScreen({super.key});
@@ -16,6 +19,7 @@ class OurUsersScreenState extends State<OurUsersScreen> {
   int? _selectedUserIndex;
   List<DocumentSnapshot> _users = [];
 
+  String? cUser = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
     super.initState();
@@ -36,6 +40,11 @@ class OurUsersScreenState extends State<OurUsersScreen> {
       _users.removeAt(index);
       _selectedUserIndex = null;
     });
+
+    // Log user deletion activity
+    final userId = user.id;
+    AdminService()
+        .logActivity(cUser!, 'User Deletion', 'Deleted user with ID: $userId');
   }
 
   @override
@@ -233,7 +242,7 @@ class OurUsersScreenState extends State<OurUsersScreen> {
                 style: GoogleFonts.aboreto(
                     fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              Divider(),
+              const Divider(),
               const SizedBox(height: 10),
               Text('Email: $email', style: GoogleFonts.abel(fontSize: 16)),
               const SizedBox(height: 5),
@@ -241,11 +250,11 @@ class OurUsersScreenState extends State<OurUsersScreen> {
               const SizedBox(height: 5),
               Text('Address: $address', style: GoogleFonts.abel(fontSize: 16)),
               const SizedBox(height: 5),
-              Divider(),
+              const Divider(),
               Text('Last 5 Purchases:',
                   style: GoogleFonts.aboreto(
                       fontSize: 18, fontWeight: FontWeight.bold)),
-              Divider(),
+              const Divider(),
               const SizedBox(height: 10),
               _buildLastPurchases(purchaseHistory),
             ],
@@ -313,5 +322,10 @@ class OurUsersScreenState extends State<OurUsersScreen> {
         ),
       ),
     );
+
+    // Log user suspension activity
+    final action = newStatus == 'suspended' ? 'Suspended' : 'Lifted Suspension';
+    AdminService().logActivity(
+        cUser!, 'User Suspension', '$action user with ID: $userId');
   }
 }
