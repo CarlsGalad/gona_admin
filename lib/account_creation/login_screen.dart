@@ -29,9 +29,10 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
         context: context,
         builder: (context) {
-          return const Center(
-            child:
-                CircularProgressIndicator(), // TODO: find a better loading indicator
+          return Center(
+            child: CircularProgressIndicator(
+              color: Colors.grey[300],
+            ), // TODO: find a better loading indicator
           );
         });
 // first try sign in user
@@ -46,12 +47,13 @@ class _LoginPageState extends State<LoginPage> {
       if (e.code == 'user=not-found') {
         print('user=not-found${e.code}');
         showDialog(
-            context: context,
-            builder: (context) {
-              return Center(
-                child: Text(e.code), // TODO: find a better loading indicator
-              );
-            });
+          context: context,
+          builder: (context) {
+            return Center(
+              child: Text(e.code), // TODO: find a better loading indicator
+            );
+          },
+        );
         //show error to user
         // showErrorMessage(e.code);
       }
