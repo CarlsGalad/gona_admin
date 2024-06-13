@@ -41,10 +41,10 @@
 //     if (!userSnapshot.exists) {
 //       await firestore.collection('admin').doc(user.uid).set(
 //         {
-//           'displayName': user.displayName ?? '',
+//           'firstName': user.displayName ?? '',
 //           'email': user.email ?? '',
-//           'photoURL': user.photoURL ?? '',
-//           'phoneNumber': user.phoneNumber ?? '',
+//           'imagePath': user.photoURL ?? '',
+//           'mobile': user.phoneNumber ?? '',
 //         },
 //       );
 //     }
