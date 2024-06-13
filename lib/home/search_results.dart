@@ -47,6 +47,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         _isLoading = false;
       });
 
+
       if (results.isEmpty) {
         setState(() {
           _errorMessage = 'No results found.';
