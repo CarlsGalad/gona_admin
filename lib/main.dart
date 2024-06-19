@@ -11,7 +11,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.web,
   );
-
+  
   // Start the app after initializing services
   runApp(const GonaAdmin());
 }
