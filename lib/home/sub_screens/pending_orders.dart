@@ -43,8 +43,22 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
                   doc['orderStatus']['delivered'] == false)
               .toList();
           if (orders.isEmpty) {
-            return const Center(
-              child: Text('There are no Pending orders yet!'),
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'There are no Pending orders yet!',
+                        style: GoogleFonts.abel(fontSize: 14),
+                      ),
+                    )),
+              ),
             );
           }
           return ListView.builder(
@@ -97,7 +111,7 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Please select an order',
-                style: GoogleFonts.abel(),
+                style: GoogleFonts.abel(fontSize: 14),
               ),
             ),
           ),
@@ -118,13 +132,14 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
             Text(
               'Order ${order['order_id']}',
               style: GoogleFonts.aboreto(
-                  fontSize: 20, fontWeight: FontWeight.bold),
+                  fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
               'Order Details:',
               style:
-                  GoogleFonts.abel(fontSize: 18, fontWeight: FontWeight.bold),
+                  GoogleFonts.abel(fontSize: 18, color: Colors.white,
+                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Container(
@@ -167,7 +182,7 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
                       style: GoogleFonts.aboreto(
                           fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    Divider(),
+                    const Divider(),
                     Text(
                       'Name: ${shippingInfo['name']}',
                       style: GoogleFonts.abel(),
@@ -218,14 +233,15 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        centerTitle: true,
+        title: Text(
           'Pending Orders',
-          style: TextStyle(color: Colors.white),
+          style: GoogleFonts.lato(color: Colors.white),
         ),
         toolbarHeight: 50,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.grey[900],
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 30.0),
@@ -249,7 +265,7 @@ class PendingOrderScreenState extends State<PendingOrderScreen> {
             width: MediaQuery.of(context).size.width - 160,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: Colors.blueGrey,
+              color: Colors.grey[900],
             ),
             child: Row(
               children: [
