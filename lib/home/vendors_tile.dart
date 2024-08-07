@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class VendorCountTile extends StatefulWidget {
   const VendorCountTile({super.key});
@@ -41,21 +42,9 @@ class _VendorCountTileState extends State<VendorCountTile> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
+      child: SizedBox(
         width: 120,
         height: 120,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            colors: [
-              Colors.blueGrey,
-              Colors.deepPurple,
-              Colors.deepPurpleAccent,
-              Colors.deepPurple,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Padding(
           padding: const EdgeInsets.only(left: 15),
           child: Column(
@@ -66,28 +55,28 @@ class _VendorCountTileState extends State<VendorCountTile> {
                 padding: EdgeInsets.only(top: 10.0, right: 10),
                 child: Icon(
                   Icons.verified_user,
-                  color: Colors.grey,
-                  size: 25,
+                  color: Colors.green,
+                  size: 20,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 5.0, right: 10),
                 child: Text(
                   '$_newVendorCount', // Display number of new vendors
-                  style: const TextStyle(
+                  style: GoogleFonts.aboreto(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                      color: Colors.grey),
                   textAlign: TextAlign.start,
                   softWrap: false,
                 ),
               ),
               const Spacer(),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12.0),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'New Vendors',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: GoogleFonts.abel(fontWeight: FontWeight.bold),
                 ),
               )
             ],
