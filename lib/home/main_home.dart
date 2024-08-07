@@ -45,16 +45,16 @@ class _MainHomeState extends State<MainHome> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        color: Colors.black54,
+        color: Colors.white,
         child: Column(
           children: [
             Container(
               decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 26, 25, 25),
+                  color: Colors.white,
                   borderRadius:
                       BorderRadius.only(topRight: Radius.circular(15))),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 20.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,12 +107,12 @@ class _MainHomeState extends State<MainHome> {
                         ),
                         const Column(
                           children: [
-                            SalesOverviewTile(),
                             DailyChart(),
+                            SalesOverviewTile(),
                           ],
                         ),
                         // Top Items
-                        const TopItems(),
+                        TopItems(),
                       ],
                     ),
                   ],
