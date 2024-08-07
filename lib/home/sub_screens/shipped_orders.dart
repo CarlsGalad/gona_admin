@@ -17,28 +17,15 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          centerTitle: true,
           title: Text(
             'Shipped Orders',
-            style: GoogleFonts.roboto(color: Colors.white),
+            style: GoogleFonts.lato(color: Colors.white),
           ),
           toolbarHeight: 50,
-          backgroundColor: Colors.black,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 30.0),
-              child: AnimatedContainer(
-                duration: const Duration(
-                  milliseconds: 500,
-                ),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.search),
-                ),
-              ),
-            )
-          ],
+          backgroundColor: Colors.grey[900],
         ),
         body: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -47,7 +34,7 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
                 width: MediaQuery.of(context).size.width - 160,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.blueGrey),
+                    color: Colors.grey[900]),
                 child: Row(
                   children: [
                     Expanded(
@@ -56,7 +43,7 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
                     ),
                     const VerticalDivider(
                       width: 1,
-                      color: Colors.white24,
+                      color: Colors.white,
                     ),
                     Expanded(
                       flex: 3,
@@ -87,8 +74,19 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
                 .toList();
 
             if (orders.isEmpty) {
-              return const Center(
-                child: Text('There are no shipped orders.'),
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('There are no shipped orders.'),
+                    ),
+                  ),
+                ),
               );
             }
 
@@ -107,7 +105,7 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                       height: 70,
-                      color: Colors.white24,
+                      color: Colors.white,
                       child: ListTile(
                         title: Text(
                           'Order Id: ${order.id}',
@@ -139,12 +137,13 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white38,
-              ),
-              child: const Padding(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              child: Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('Please select an order'),
+                child: Text(
+                  'Please select an order',
+                  style: GoogleFonts.abel(fontWeight: FontWeight.bold),
+                ),
               )),
         ),
       );
@@ -163,13 +162,17 @@ class ShippedOrderScreenState extends State<ShippedOrderScreen> {
             Text(
               'Order Id ${order.id}',
               style: GoogleFonts.aboreto(
-                  fontSize: 20, fontWeight: FontWeight.bold),
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
               'Order Details:',
-              style:
-                  GoogleFonts.abel(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.abel(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Container(
