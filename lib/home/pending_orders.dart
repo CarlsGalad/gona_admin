@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PendingOrderTile extends StatefulWidget {
   const PendingOrderTile({super.key});
@@ -38,23 +39,9 @@ class _PendingOrderTileState extends State<PendingOrderTile> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
+      child: SizedBox(
         width: 120,
         height: 120,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(begin: Alignment.bottomLeft, colors: [
-            Colors.blueGrey,
-            Colors.deepPurple,
-            Colors.deepPurpleAccent,
-            Colors.deepPurple,
-          ], stops: [
-            0.1,
-            0.3,
-            0.9,
-            1.0
-          ]),
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Padding(
           padding: const EdgeInsets.only(left: 15),
           child: Column(
@@ -64,29 +51,29 @@ class _PendingOrderTileState extends State<PendingOrderTile> {
               const Padding(
                 padding: EdgeInsets.only(top: 10.0, right: 10),
                 child: Icon(
-                  Icons.access_time,
-                  color: Colors.grey,
-                  size: 30,
+                  Icons.hourglass_empty,
+                  color: Colors.yellow,
+                  size: 20,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 1.0, right: 10),
                 child: Text(
                   '$_pendingOrdersCount', // Display the pending order
-                  style: const TextStyle(
+                  style: GoogleFonts.aboreto(
                       fontSize: 30,
-                      color: Colors.white,
+                      color: Colors.grey,
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.start,
                   softWrap: false,
                 ),
               ),
               const Spacer(),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'Pending Orders',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: GoogleFonts.abel(fontWeight: FontWeight.bold),
                 ),
               )
             ],
