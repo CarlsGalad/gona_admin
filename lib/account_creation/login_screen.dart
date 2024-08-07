@@ -42,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
+      print(e);
       Navigator.pop(context);
       //if wrong email
       if (e.code == 'user=not-found') {
@@ -208,16 +209,16 @@ class _LoginPageState extends State<LoginPage> {
                         //sign in button
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                          child: GestureDetector(
-                            onTap: () {
+                          child: MaterialButton(
+                            color: const Color.fromARGB(255, 49, 105, 11),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            onPressed: () {
                               signUserIn();
                             },
-                            child: Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                  color: const Color.fromARGB(255, 49, 105, 11),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: const Center(
+                            child: const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
                                 child: Text(
                                   'Sign In',
                                   style: TextStyle(
