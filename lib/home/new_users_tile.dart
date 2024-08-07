@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NewUsersCountTile extends StatefulWidget {
   const NewUsersCountTile({super.key});
@@ -44,19 +45,6 @@ class _NewUsersCountTileState extends State<NewUsersCountTile> {
       child: Container(
         width: 255,
         height: 120,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blueGrey,
-              Colors.deepPurple,
-              Colors.deepPurpleAccent,
-              Colors.deepPurple,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Padding(
           padding: const EdgeInsets.only(left: 15),
           child: Column(
@@ -67,28 +55,28 @@ class _NewUsersCountTileState extends State<NewUsersCountTile> {
                 padding: EdgeInsets.only(top: 10.0, right: 10),
                 child: Icon(
                   Icons.people,
-                  color: Colors.grey,
-                  size: 30,
+                  color: Colors.green,
+                  size: 20,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 5.0, right: 10),
                 child: Text(
                   '$_newUserCount', // Display the num of new users inthe last one week
-                  style: const TextStyle(
+                  style: GoogleFonts.aboreto(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                      color: Colors.grey),
                   textAlign: TextAlign.start,
                   softWrap: false,
                 ),
               ),
               const Spacer(),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'New Users',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: GoogleFonts.abel(fontWeight: FontWeight.bold),
                 ),
               )
             ],
