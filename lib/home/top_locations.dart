@@ -17,30 +17,22 @@ class _PieChartWidgetState extends State<PieChartWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: const LinearGradient(begin: Alignment.topCenter, colors: [
-            Colors.indigo,
-            Colors.blueGrey,
-            Colors.teal,
-            Colors.white24,
-            Colors.white30,
-            Colors.white54,
-            Colors.white,
-          ]),
-          border: Border.all(color: Colors.white, width: 3)),
-      width: 300,
-      height: 300,
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: PieChart(
-          PieChartData(
-              sections: _chartSections(sectors),
-              centerSpaceRadius: 48.0,
-              borderData: FlBorderData(
-                show: true,
-              )),
+    return SizedBox(
+      width: 200,
+      height: 200,
+      child: Card(
+        elevation: 4,
+        shape: CircleBorder(side: BorderSide(color: Colors.white, width: 3)),
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: PieChart(
+            PieChartData(
+                sections: _chartSections(sectors),
+                centerSpaceRadius: 48.0,
+                borderData: FlBorderData(
+                  show: true,
+                )),
+          ),
         ),
       ),
     );
