@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TopItems extends StatefulWidget {
   const TopItems({super.key});
@@ -52,22 +53,18 @@ class _TopItemsState extends State<TopItems> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(15),
-          ),
+        padding: EdgeInsets.all(8.0),
+        child: SizedBox(
           child: Padding(
-            padding: const EdgeInsets.all(15.0),
+            padding: EdgeInsets.all(15.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title
-                const Text(
+                Text(
                   'Top Items',
-                  style: TextStyle(
-                    color: Colors.white,
+                  style: GoogleFonts.abel(
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                   softWrap: false,
@@ -83,10 +80,10 @@ class _TopItemsState extends State<TopItems> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (snapshot.data!.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text(
                             'No top items available',
-                            style: TextStyle(color: Colors.white),
+                            style: GoogleFonts.abel(color: Colors.black),
                           ),
                         );
                       }
@@ -99,21 +96,23 @@ class _TopItemsState extends State<TopItems> {
                           return ListTile(
                             title: Text(
                               item['itemName'],
-                              style: const TextStyle(
-                                  color: Colors.blueGrey, fontSize: 13),
+                              style: GoogleFonts.abel(
+                                  color: Colors.black, fontSize: 13),
                               softWrap: false,
+                              overflow: TextOverflow.fade,
                             ),
                             subtitle: Text(
                               'Quantity Sold: ${item['quantitySold']}',
-                              style: const TextStyle(
+                              style: GoogleFonts.abel(
                                   color: Colors.grey, fontSize: 10),
                               softWrap: false,
                             ),
                             trailing: Text(
                               'Vendor: ${item['vendorName']}',
-                              style: const TextStyle(
+                              style: GoogleFonts.abel(
                                   color: Colors.grey, fontSize: 10),
                               softWrap: false,
+                              overflow: TextOverflow.fade,
                             ),
                           );
                         },
