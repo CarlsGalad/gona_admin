@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
 import '../services/admin_service.dart';
 
@@ -162,50 +163,56 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      width: MediaQuery.of(context).size.width - 150,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Categories',
-            style: TextStyle(fontSize: 20),
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width - 150,
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text(
+              'Categories',
+              style: GoogleFonts.lato(fontSize: 20, 
+              color: Colors.white),
+            ),
+            toolbarHeight: 50,
+            elevation: 5,
+            backgroundColor: Colors.grey[900],
           ),
-          toolbarHeight: 50,
-          elevation: 5,
-        ),
-        body: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: _buildCategoriesGridView(),
-            ),
-            const VerticalDivider(
-              thickness: 1,
-              width: 2,
-              color: Colors.grey,
-            ),
-            Expanded(
-              flex: 3,
-              child: _selectedCategoryIndex == null
-                  ? Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Text(
-                            'Please select a category',
-                            style: TextStyle(color: Colors.blueGrey),
+          body: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: _buildCategoriesGridView(),
+              ),
+              VerticalDivider(
+                thickness: 1,
+                width: 2,
+                color: Colors.grey[900],
+              ),
+              Expanded(
+                flex: 3,
+                child: _selectedCategoryIndex == null
+                    ? Center(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              'Please select a category',
+                              style: GoogleFonts.abel(color: Colors.black),
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  : _buildSubcategoriesListView(),
-            ),
-          ],
+                      )
+                    : _buildSubcategoriesListView(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -233,8 +240,8 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: _selectedCategoryIndex == index
-                      ? Colors.blue[200]
-                      : Colors.blue[100],
+                      ? Colors.grey[200]
+                      : Colors.grey[900],
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
@@ -273,8 +280,13 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             category['name'],
-                            style: const TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold),
+                            style: GoogleFonts.abel(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _selectedCategoryIndex == index
+                                  ? Colors.grey[900]
+                                  : Colors.grey[200],
+                            ),
                           ),
                         ),
                       ),
@@ -288,6 +300,7 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddCategoryDialog,
+        backgroundColor: Colors.orange.shade200,
         child: const Icon(Icons.add),
       ),
     );
@@ -336,9 +349,9 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
                   onTap: _pickImage,
                   child: Container(
                     alignment: Alignment.center,
-                    width: 200,
-                    height: 200,
-                    color: Colors.grey,
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey[900],
                     child: _imageFile != null
                         ? Image.memory(
                             Uint8List.fromList(_imageFile!.bytes!),
@@ -401,14 +414,19 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  decoration: BoxDecoration(color: Colors.blue[200]),
+                  decoration: BoxDecoration(color: Colors.grey[900]),
                   child: ListTile(
-                    title: Text(subcategory['name']),
+                    title: Text(
+                      subcategory['name'],
+                      style: GoogleFonts.abel(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit),
+                          color: Colors.amber,
                           onPressed: () {
                             _showEditSubcategoryDialog(
                                 subcategory.id, subcategory['name']);
@@ -416,15 +434,13 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
+                          color: Colors.red,
                           onPressed: () {
                             _showDeleteSubcategoryDialog(subcategory.id);
                           },
                         ),
                       ],
                     ),
-                    onTap: () {
-                      // Handle subcategory tap action
-                    },
                   ),
                 ),
               );
@@ -432,6 +448,7 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.add),
+            backgroundColor: Colors.orange[200],
             onPressed: _showAddSubcategoryDialog,
           ),
         );
@@ -479,6 +496,7 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: const Text('Edit Subcategory'),
           content: TextField(
             controller: subcategoryController,
@@ -491,7 +509,11 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
               },
               child: const Text('Cancel'),
             ),
-            TextButton(
+            MaterialButton(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              color: Colors.orange.shade200,
               onPressed: () {
                 _editSubcategory(subcategoryId, subcategoryController.text);
                 Navigator.of(context).pop();
@@ -509,11 +531,14 @@ class ManageCategoryScreenState extends State<ManageCategoryScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Subcategory'),
+          title: const Text('Delete Subcategory? '),
           content:
               const Text('Are you sure you want to delete this subcategory?'),
           actions: [
-            TextButton(
+            MaterialButton(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
