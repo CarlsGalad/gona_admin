@@ -34,9 +34,22 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
                     doc['orderStatus']['delivered'] == false)
                 .toList();
             if (orders.isEmpty) {
-              return const Center(
-                child: Text('There are no processed orders.'),
-              );
+              return Center(
+                  child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'There are no Processed orders yet!',
+                        style: GoogleFonts.abel(fontSize: 14),
+                      ),
+                    )),
+              ));
             }
             return ListView.builder(
               itemCount: orders.length, // Number of processed orders
@@ -50,7 +63,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
                     height: 70,
-                    color: Colors.white24,
+                    color: Colors.white,
                     child: ListTile(
                       title: Text(
                         'Order: ${order.id}',
@@ -109,12 +122,17 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
             Text(
               'Order ${order['order_id']}',
               style: GoogleFonts.aboreto(
-                  fontSize: 20, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-           Text(
+            Text(
               'Order Details:',
-              style: GoogleFonts.abel(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.abel(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             const Divider(),
@@ -223,14 +241,14 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'Processed Orders',
           style: GoogleFonts.roboto(color: Colors.white),
         ),
         toolbarHeight: 50,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.grey[900],
         centerTitle: true,
         actions: [
           Padding(
@@ -255,7 +273,7 @@ class ProcessedOrderScreenState extends State<ProcessedOrderScreen> {
             width: MediaQuery.of(context).size.width - 150,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: Colors.blueGrey,
+              color: Colors.grey[900],
             ),
             child: Row(
               children: [
