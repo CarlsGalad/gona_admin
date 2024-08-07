@@ -17,29 +17,16 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(
             'Delivered Orders',
-            style: GoogleFonts.roboto(color: Colors.white),
+            style: GoogleFonts.lato(color: Colors.grey[900]),
           ),
           toolbarHeight: 50,
           centerTitle: true,
-          backgroundColor: Colors.black,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 30.0),
-              child: AnimatedContainer(
-                duration: const Duration(
-                  milliseconds: 500,
-                ),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.search),
-                ),
-              ),
-            )
-          ],
+          backgroundColor: Colors.grey[900],
+          
         ),
         body: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -48,7 +35,7 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
                 width: MediaQuery.of(context).size.width - 150,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.blueGrey),
+                    color: Colors.grey[900]),
                 child: Row(
                   children: [
                     Expanded(
@@ -88,8 +75,22 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
                 .toList();
 
             if (orders.isEmpty) {
-              return const Center(
-                child: Text('There are no delivered orders.'),
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'There are no delivered orders.',
+                        style: GoogleFonts.abel(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
               );
             }
 
@@ -141,7 +142,7 @@ class DeliveredOrderScreenState extends State<DeliveredOrderScreen> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white54,
+              color: Colors.white,
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
