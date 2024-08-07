@@ -22,30 +22,34 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width - 160,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10), color: Colors.blueGrey),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: _buildDisputesListView(),
-            ),
-            const VerticalDivider(
-              thickness: 1,
-              width: 2,
-              color: Color.fromARGB(255, 26, 25, 25),
-            ),
-            Expanded(
-              flex: 3,
-              child: _selectedDisputeIndex == null
-                  ? const Center(
-                      child: Text('Please select a dispute'),
-                    )
-                  : _buildDisputeDetailsView(),
-            ),
-          ],
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+        child: Container(
+          width: MediaQuery.of(context).size.width - 160,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10), color: Colors.grey[900]),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: _buildDisputesListView(),
+              ),
+              const VerticalDivider(
+                thickness: 1,
+                width: 2,
+                color: Color.fromARGB(255, 26, 25, 25),
+              ),
+              Expanded(
+                flex: 3,
+                child: _selectedDisputeIndex == null
+                    ? const Center(
+                        child: Text('Please select a dispute'),
+                      )
+                    : _buildDisputeDetailsView(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -72,8 +76,9 @@ class ManageDisputesScreenState extends State<ManageDisputesScreen> {
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
-                  child: Container(
-                    decoration: const BoxDecoration(color: Colors.grey),
+                  child: Card(
+                    elevation: 5,
+                    color: Colors.white,
                     child: ListTile(
                       title: Text(
                         'Category: ${dispute['category']}',
