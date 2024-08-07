@@ -33,9 +33,11 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
     if (currentUser != null) {
       DocumentSnapshot headAdminSnapshot =
           await _firestore.collection('admin').doc(currentUser.uid).get();
-      setState(() {
-        _headAdmin = headAdminSnapshot;
-      });
+      if (headAdminSnapshot.exists) {
+        setState(() {
+          _headAdmin = headAdminSnapshot;
+        });
+      }
     }
   }
 
@@ -63,7 +65,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
           .update({'status': newStatus});
 
       // Log the action of suspending/unsuspending an admin
-      if (adminId != null) {
+      if (adminId.isNotEmpty) {
         String action = newStatus == 'suspended' ? 'Suspended' : 'Unsuspended';
         AdminService().logActivity(adminId, action, 'Admin ID: $adminId');
       }
@@ -75,7 +77,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
           .update({'status': 'suspended'});
 
       // Log the action of suspending an admin
-      if (adminId != null) {
+      if (adminId.isNotEmpty) {
         AdminService().logActivity(adminId, 'Suspended', 'Admin ID: $adminId');
       }
     }
@@ -85,7 +87,7 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
     await _firestore.collection('admin').doc(adminId).delete();
 
     // Log the action of deleting an admin
-    if (adminId != null) {
+    if (adminId.isNotEmpty) {
       AdminService().logActivity(adminId, 'Deleted', 'Admin ID: $adminId');
     }
   }
@@ -156,235 +158,243 @@ class AdminManagementScreenState extends State<AdminManagementScreen> {
     return ConstrainedBox(
       constraints:
           BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 150),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Admin Management',
-              style: GoogleFonts.roboto(color: Colors.white54)),
-          backgroundColor: Colors.black,
-          centerTitle: true,
-        ),
-        body: Row(
-          children: [
-            // Left Flex 1: Head Admin Details
-            Expanded(
-              flex: 1,
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                color: Colors.grey[200],
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Head Admin Details',
-                        style: GoogleFonts.aboreto(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    const Divider(),
-                    _headAdmin == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  'Name: ${_headAdmin!['firstName']} '
-                                  ' ${_headAdmin!['lastName']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                              Text('Email: ${_headAdmin!['email']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                              Text('Phone: ${_headAdmin!['mobile']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                              Text('Department: ${_headAdmin!['department']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                              Text('Role: ${_headAdmin!['role']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                              Text('Date of Birth: ${_headAdmin!['birthDate']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                            ],
-                          ),
-                  ],
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Admin Management',
+                style: GoogleFonts.roboto(color: Colors.white54)),
+            backgroundColor: Colors.black,
+            centerTitle: true,
+          ),
+          body: Row(
+            children: [
+              // Left Flex 1: Head Admin Details
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  color: Colors.grey[200],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Head Admin Details',
+                          style: GoogleFonts.aboreto(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      const Divider(),
+                      _headAdmin == null
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    'Name: ${_headAdmin!['firstName']} '
+                                    ' ${_headAdmin!['lastName']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                                Text('Email: ${_headAdmin!['email']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                                Text('Phone: ${_headAdmin!['mobile']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                                Text('Department: ${_headAdmin!['department']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                                Text('Role: ${_headAdmin!['role']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                                Text(
+                                    'Date of Birth: ${_headAdmin!['birthDate']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                              ],
+                            ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const VerticalDivider(width: 1),
+              const VerticalDivider(width: 1),
 
-            // Center Flex 2: List of Admins
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                color: Colors.white,
-                child: FutureBuilder<List<DocumentSnapshot>>(
-                  future: _fetchAdmins(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(
-                          child: Text('No admins found.',
-                              style: GoogleFonts.abel()));
-                    }
+              // Center Flex 2: List of Admins
+              Expanded(
+                flex: 2,
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  color: Colors.white,
+                  child: FutureBuilder<List<DocumentSnapshot>>(
+                    future: _fetchAdmins(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                            child: Text('No admins found.',
+                                style: GoogleFonts.abel()));
+                      }
 
-                    List<DocumentSnapshot> admins = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: admins.length,
-                      itemBuilder: (context, index) {
-                        var admin =
-                            admins[index].data() as Map<String, dynamic>;
-                        final fistName = admin['firstName'] ?? '';
-                        final lastName = admin['lastName'] ?? '';
-                        final status = admin['status'] ?? 'active';
-                        final department = admin['department'] ?? '';
-                        final role = admin['role'] ?? '';
-                        final image = admin['imagePath'] ?? '';
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(color: Colors.grey[200]),
-                            child: ListTile(
-                              selectedTileColor: Colors.grey[200],
-                              minLeadingWidth: 50,
-                              leading: SizedBox(
-                                width: 50,
-                                child: ImageNetwork(
-                                  image: image,
+                      List<DocumentSnapshot> admins = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: admins.length,
+                        itemBuilder: (context, index) {
+                          var admin =
+                              admins[index].data() as Map<String, dynamic>;
+                          final fistName = admin['firstName'] ?? '';
+                          final lastName = admin['lastName'] ?? '';
+                          final status = admin['status'] ?? 'active';
+                          final department = admin['department'] ?? '';
+                          final role = admin['role'] ?? '';
+                          final image = admin['imagePath'] ?? '';
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration:
+                                  BoxDecoration(color: Colors.grey[200]),
+                              child: ListTile(
+                                selectedTileColor: Colors.grey[200],
+                                minLeadingWidth: 50,
+                                leading: SizedBox(
                                   width: 50,
-                                  height: 50,
-                                  borderRadius: BorderRadius.circular(45),
+                                  child: ImageNetwork(
+                                    image: image,
+                                    width: 50,
+                                    height: 50,
+                                    borderRadius: BorderRadius.circular(45),
+                                  ),
                                 ),
+                                title: Text(
+                                  '$fistName $lastName',
+                                  style: GoogleFonts.abel(fontSize: 16),
+                                ),
+                                subtitle: Text('$department - $role - $status',
+                                    style: GoogleFonts.abel()),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      tooltip: 'Suspend/Unsuspend staff',
+                                      icon: Icon(status == 'suspended'
+                                          ? Icons.play_arrow
+                                          : Icons.pause),
+                                      color: status == 'suspended'
+                                          ? Colors.green
+                                          : Colors.orange,
+                                      onPressed: () {
+                                        _showConfirmationDialog(
+                                            admins[index].id,
+                                            'Suspend/Unsuspend');
+                                      },
+                                    ),
+                                    IconButton(
+                                      tooltip: 'Erase data',
+                                      icon: const Icon(Icons.delete),
+                                      color: Colors.red,
+                                      onPressed: () {
+                                        _showConfirmationDialog(
+                                            admins[index].id, 'Delete');
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                onTap: () async {
+                                  DocumentSnapshot adminDetails =
+                                      await _fetchAdminDetails(
+                                          admins[index].id);
+                                  setState(() {
+                                    _selectedAdmin = adminDetails;
+                                  });
+                                  // Log the action of viewing a dispute
+                                  if (adminId != null) {
+                                    AdminService().logActivity(
+                                        adminId!,
+                                        'View Staff details',
+                                        'Viewed details of dispute with ID "${_selectedAdmin!.id}"');
+                                  }
+                                },
                               ),
-                              title: Text(
-                                '$fistName $lastName',
-                                style: GoogleFonts.abel(fontSize: 16),
-                              ),
-                              subtitle: Text('$department - $role - $status',
-                                  style: GoogleFonts.abel()),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    tooltip: 'Suspend/Unsuspend staff',
-                                    icon: Icon(status == 'suspended'
-                                        ? Icons.play_arrow
-                                        : Icons.pause),
-                                    color: status == 'suspended'
-                                        ? Colors.green
-                                        : Colors.orange,
-                                    onPressed: () {
-                                      _showConfirmationDialog(admins[index].id,
-                                          'Suspend/Unsuspend');
-                                    },
-                                  ),
-                                  IconButton(
-                                    tooltip: 'Erase data',
-                                    icon: const Icon(Icons.delete),
-                                    color: Colors.red,
-                                    onPressed: () {
-                                      _showConfirmationDialog(
-                                          admins[index].id, 'Delete');
-                                    },
-                                  ),
-                                ],
-                              ),
-                              onTap: () async {
-                                DocumentSnapshot adminDetails =
-                                    await _fetchAdminDetails(admins[index].id);
-                                setState(() {
-                                  _selectedAdmin = adminDetails;
-                                });
-                                // Log the action of viewing a dispute
-                                if (adminId != null) {
-                                  AdminService().logActivity(
-                                      adminId!,
-                                      'View Staff details',
-                                      'Viewed details of dispute with ID "${_selectedAdmin!.id}"');
-                                }
-                              },
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            const VerticalDivider(width: 1),
+              const VerticalDivider(width: 1),
 
-            // Right Flex 1: Admin Details and Activity Logs
-            Expanded(
-              flex: 1,
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                color: Colors.grey[100],
-                child: _selectedAdmin == null
-                    ? Center(
-                        child: Text('Select an admin to view details.',
-                            style: GoogleFonts.abel()))
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text('Admin Details',
-                                  style: GoogleFonts.aboreto(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
-                              const Spacer(),
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: _editAdminDetails,
-                              ),
-                            ],
-                          ),
-                          ImageNetwork(
-                              image: '${_selectedAdmin!['imagePath']}',
-                              height: 100,
-                              width: 100),
-                          const Divider(),
-                          // Display selected admin details here
-                          Row(
-                            children: [
-                              Text('Name: ${_selectedAdmin!['firstName']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Text('${_selectedAdmin!['lastName']}',
-                                  style: GoogleFonts.abel(fontSize: 16)),
-                            ],
-                          ),
-                          Text('Email: ${_selectedAdmin!['email']}',
-                              style: GoogleFonts.abel(fontSize: 16)),
-                          Text('Email: ${_selectedAdmin!['mobile']}',
-                              style: GoogleFonts.abel(fontSize: 16)),
-                          Text('Department: ${_selectedAdmin!['department']}',
-                              style: GoogleFonts.abel(fontSize: 16)),
-                          Text('Role: ${_selectedAdmin!['role']}',
-                              style: GoogleFonts.abel(fontSize: 16)),
-                          const Divider(),
-                          Text('Activity Logs',
-                              style: GoogleFonts.aboreto(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          const Divider(),
-                          // Display activity logs here
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: (_selectedAdmin!['activityLogs']
-                                      as Map<String, dynamic>)
-                                  .length,
-                              itemBuilder: (context, index) {
-                                var log = (_selectedAdmin!['activityLogs']
-                                    as Map<String, dynamic>)[index];
-                                return ListTile(
-                                  title: Text(log, style: GoogleFonts.abel()),
-                                );
-                              },
+              // Right Flex 1: Admin Details and Activity Logs
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  color: Colors.grey[100],
+                  child: _selectedAdmin == null
+                      ? Center(
+                          child: Text('Select an admin to view details.',
+                              style: GoogleFonts.abel()))
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text('Admin Details',
+                                    style: GoogleFonts.aboreto(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                                const Spacer(),
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: _editAdminDetails,
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
+                            ImageNetwork(
+                                image: '${_selectedAdmin!['imagePath']}',
+                                height: 100,
+                                width: 100),
+                            const Divider(),
+                            // Display selected admin details here
+                            Row(
+                              children: [
+                                Text('Name: ${_selectedAdmin!['firstName']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Text('${_selectedAdmin!['lastName']}',
+                                    style: GoogleFonts.abel(fontSize: 16)),
+                              ],
+                            ),
+                            Text('Email: ${_selectedAdmin!['email']}',
+                                style: GoogleFonts.abel(fontSize: 16)),
+                            Text('Email: ${_selectedAdmin!['mobile']}',
+                                style: GoogleFonts.abel(fontSize: 16)),
+                            Text('Department: ${_selectedAdmin!['department']}',
+                                style: GoogleFonts.abel(fontSize: 16)),
+                            Text('Role: ${_selectedAdmin!['role']}',
+                                style: GoogleFonts.abel(fontSize: 16)),
+                            const Divider(),
+                            Text('Activity Logs',
+                                style: GoogleFonts.aboreto(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                            const Divider(),
+                            // Display activity logs here
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: (_selectedAdmin!['activityLogs']
+                                        as Map<String, dynamic>)
+                                    .length,
+                                itemBuilder: (context, index) {
+                                  var log = (_selectedAdmin!['activityLogs']
+                                      as Map<String, dynamic>)[index];
+                                  return ListTile(
+                                    title: Text(log, style: GoogleFonts.abel()),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
