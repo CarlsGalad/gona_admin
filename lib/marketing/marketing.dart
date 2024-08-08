@@ -136,16 +136,19 @@ class MarketingScreenState extends State<MarketingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 150,
         child: Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
             title: Text(
               'Marketing',
-              style: GoogleFonts.roboto(color: Colors.white54),
+              style: GoogleFonts.lato(color: Colors.white54),
             ),
-            backgroundColor: Colors.black,
+            backgroundColor: Colors.grey[900],
             centerTitle: true,
           ),
           body: Row(
@@ -162,7 +165,7 @@ class MarketingScreenState extends State<MarketingScreen> {
                         value: selectedTopic,
                         hint: Text(
                           'Select Topic',
-                          style: GoogleFonts.abel(fontSize: 16),
+                          style: GoogleFonts.abel(fontSize: 14),
                         ),
                         onChanged: (value) {
                           setState(() {
@@ -176,30 +179,37 @@ class MarketingScreenState extends State<MarketingScreen> {
                           });
                         },
                         borderRadius: BorderRadius.circular(10),
-                        dropdownColor: Colors.deepPurpleAccent,
+                        dropdownColor: Colors.black.withOpacity(0.5),
                         items: [
                           DropdownMenuItem(
                             value: 'new_products',
-                            child:
-                                Text('New Products', style: GoogleFonts.abel()),
+                            child: Text('New Products',
+                                style: GoogleFonts.abel(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           ),
                           DropdownMenuItem(
                             value: 'promotions',
                             child: Text(
                               'Promotions',
-                              style: GoogleFonts.abel(),
+                              style: GoogleFonts.abel(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                           DropdownMenuItem(
                             value: 'order_updates',
                             child: Text('Order Updates',
-                                style: GoogleFonts.abel()),
+                                style: GoogleFonts.abel(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
                       DropdownButton<String>(
-                        style: GoogleFonts.abel(color: Colors.black),
+                        style: GoogleFonts.abel(),
                         value: selectedUserGroup,
+                        dropdownColor: Colors.black.withOpacity(0.5),
                         hint: Text(
                           'Select User Group',
                           style: GoogleFonts.abel(fontSize: 16),
@@ -218,40 +228,46 @@ class MarketingScreenState extends State<MarketingScreen> {
                           });
                         },
                         borderRadius: BorderRadius.circular(10),
-                        dropdownColor: Colors.deepPurpleAccent,
                         items: [
                           DropdownMenuItem(
                             value: 'vendors',
-                            child: Text('Vendors', style: GoogleFonts.abel()),
+                            child: Text('Vendors',
+                                style: GoogleFonts.abel(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           ),
                           DropdownMenuItem(
                             value: 'customers',
-                            child: Text('Customers', style: GoogleFonts.abel()),
+                            child: Text('Customers',
+                                style: GoogleFonts.abel(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
                       TextField(
                         controller: _titleController,
                         decoration: InputDecoration(
-                            labelText: 'Title', labelStyle: GoogleFonts.abel()),
+                            labelText: 'Title',
+                            labelStyle: GoogleFonts.abel(fontSize: 14)),
                       ),
                       TextField(
                         controller: _messageController,
                         decoration: InputDecoration(
                             labelText: 'Message',
-                            labelStyle: GoogleFonts.abel()),
+                            labelStyle: GoogleFonts.abel(fontSize: 14)),
                       ),
                       TextField(
                         controller: _emailController,
                         decoration: InputDecoration(
                             labelText: 'Email (Optional)',
-                            labelStyle: GoogleFonts.abel()),
+                            labelStyle: GoogleFonts.abel(fontSize: 14)),
                       ),
                       TextField(
                         controller: _imageUrlsController,
                         decoration: InputDecoration(
                             labelText: 'Image URLs (Comma separated)',
-                            labelStyle: GoogleFonts.abel()),
+                            labelStyle: GoogleFonts.abel(fontSize: 14)),
                       ),
                       Row(
                         children: [
@@ -298,7 +314,10 @@ class MarketingScreenState extends State<MarketingScreen> {
                       ),
                       Row(
                         children: [
-                          ElevatedButton(
+                          MaterialButton(
+                            color: Colors.orange.shade200,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5)),
                             onPressed: () {
                               sendNotification(
                                 _titleController.text,
@@ -318,14 +337,12 @@ class MarketingScreenState extends State<MarketingScreen> {
                               _clearFields();
                             },
                             child: Text('Send Notification',
-                                style: GoogleFonts.abel()),
+                                style: GoogleFonts.abel(
+                                    fontWeight: FontWeight.bold)),
                           ),
                           const SizedBox(width: 20),
-                          ElevatedButton(
+                          MaterialButton(
                             onPressed: _clearFields,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey, // Background color
-                            ),
                             child: Text('Clear', style: GoogleFonts.abel()),
                           ),
                         ],
