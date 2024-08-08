@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gona_admin/services/admin_service.dart'; // Import the AdminService
+import 'package:gona_admin/services/admin_service.dart';
+import 'package:google_fonts/google_fonts.dart'; // Import the AdminService
 
 class ChatWidget extends StatefulWidget {
   const ChatWidget({super.key});
@@ -53,214 +54,237 @@ class ChatWidgetState extends State<ChatWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black38,
-      width: MediaQuery.of(context).size.width - 150,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Live Chat',
-            style: TextStyle(color: Colors.white70),
-          ),
-          backgroundColor: Colors.black87,
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
-        body: Row(
-          children: [
-            Flexible(
-              flex: 2,
-              child: Container(
-                color: Colors.black12,
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    FutureBuilder<Map<String, String>>(
-                      future: _fetchUserNames(),
-                      builder: (context, userSnapshot) {
-                        if (!userSnapshot.hasData) {
-                          return const Center(child: LinearProgressIndicator());
-                        }
-                        return StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('liveChats')
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(
-                                  child: LinearProgressIndicator());
-                            }
-                            final chats = snapshot.data!.docs;
+        width: MediaQuery.of(context).size.width - 150,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Live Chat',
+              style: TextStyle(color: Colors.white70),
+            ),
+            backgroundColor: Colors.black87,
+          ),
+          body: Container(
+            decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20))),
+            child: Row(
+              children: [
+                Flexible(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      FutureBuilder<Map<String, String>>(
+                        future: _fetchUserNames(),
+                        builder: (context, userSnapshot) {
+                          if (!userSnapshot.hasData) {
+                            return const Center(
+                                child: LinearProgressIndicator());
+                          }
+                          return StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('liveChats')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const Center(
+                                    child: LinearProgressIndicator(
+                                  color: Colors.grey,
+                                ));
+                              }
+                              final chats = snapshot.data!.docs;
 
-                            if (chats.isEmpty) {
-                              return const Center(
-                                  child: Text(
-                                'No chats available',
-                                style: TextStyle(color: Colors.white70),
-                              ));
-                            }
-                            return Expanded(
-                              child: ListView.builder(
-                                itemCount: chats.length,
-                                itemBuilder: (context, index) {
-                                  final chat = chats[index];
-                                  final senderName =
-                                      userSnapshot.data![chat['senderId']] ??
-                                          'Unknown';
-                                  bool isNewChat = (DateTime.now()
-                                          .difference(
-                                              chat['timestamp'].toDate())
-                                          .inHours <=
-                                      24);
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      color: isNewChat
-                                          ? Colors.black45
-                                          : Colors.black26,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: ListTile(
-                                          title: Text(
-                                            chat['title'],
-                                            style: TextStyle(
-                                                fontWeight: isNewChat
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal),
+                              if (chats.isEmpty) {
+                                return const Center(
+                                    child: Text(
+                                  'No chats available',
+                                  style: TextStyle(color: Colors.black),
+                                ));
+                              }
+                              return Expanded(
+                                child: ListView.builder(
+                                  itemCount: chats.length,
+                                  itemBuilder: (context, index) {
+                                    final chat = chats[index];
+                                    final senderName =
+                                        userSnapshot.data![chat['senderId']] ??
+                                            'Unknown';
+                                    bool isNewChat = (DateTime.now()
+                                            .difference(
+                                                chat['timestamp'].toDate())
+                                            .inHours <=
+                                        24);
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Card(
+                                        elevation: 5,
+                                        margin: EdgeInsets.zero,
+                                        color: isNewChat
+                                            ? Colors.black45
+                                            : Colors.grey[900],
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: ListTile(
+                                            title: Text(
+                                              chat['title'],
+                                              style: GoogleFonts.aboreto(
+                                                  fontWeight: isNewChat
+                                                      ? FontWeight.bold
+                                                      : FontWeight.normal,
+                                                  color: Colors.white),
+                                            ),
+                                            subtitle: Text(
+                                              senderName,
+                                              style: GoogleFonts.abel(
+                                                  color: Colors.white54),
+                                            ),
+                                            onTap: () {
+                                              setState(() {
+                                                selectedChatId = chat.id;
+                                                selectedChatTitle =
+                                                    chat['title'];
+                                              });
+                                              // Log chat selection
+                                              final userId = FirebaseAuth
+                                                      .instance
+                                                      .currentUser
+                                                      ?.uid ??
+                                                  '';
+                                              _logChatSelection(
+                                                  userId, chat['title']);
+                                            },
                                           ),
-                                          subtitle: Text(senderName),
-                                          onTap: () {
-                                            setState(() {
-                                              selectedChatId = chat.id;
-                                              selectedChatTitle = chat['title'];
-                                            });
-                                            // Log chat selection
-                                            final userId = FirebaseAuth.instance
-                                                    .currentUser?.uid ??
-                                                '';
-                                            _logChatSelection(
-                                                userId, chat['title']);
-                                          },
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const VerticalDivider(
-              thickness: 1,
-              width: 2,
-              color: Color.fromARGB(255, 26, 25, 25),
-            ),
-            Flexible(
-              flex: 3,
-              child: selectedChatId == null
-                  ? const Center(
-                      child: Text('Please select a chat'),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              selectedChatTitle ?? 'Message Title',
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                            Expanded(
-                              child: StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('liveChats')
-                                    .doc(selectedChatId)
-                                    .collection('messages')
-                                    .orderBy('timestamp', descending: true)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const Center(
-                                        child: LinearProgressIndicator());
-                                  }
-                                  final messages = snapshot.data!.docs;
-                                  return ListView.builder(
-                                    reverse: true,
-                                    itemCount: messages.length,
-                                    itemBuilder: (context, index) {
-                                      final message = messages[index];
-                                      return ChatBubble(
-                                        message: message['content'],
-                                        isSender:
-                                            message['senderId'] == 'live_chat',
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: _messageController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Type a message...',
-                                      fillColor: Colors.black12,
-                                      filled: true,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
-                                const SizedBox(width: 10),
-                                IconButton(
-                                  icon: const Icon(Icons.send),
-                                  onPressed: () async {
-                                    if (_messageController.text
-                                        .trim()
-                                        .isEmpty) {
-                                      return;
-                                    }
-                                    await FirebaseFirestore.instance
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Flexible(
+                  flex: 3,
+                  child: selectedChatId == null
+                      ? const Center(
+                          child: Text('Please select a chat'),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  selectedChatTitle ?? 'Message Title',
+                                  style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Expanded(
+                                  child: StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
                                         .collection('liveChats')
                                         .doc(selectedChatId)
                                         .collection('messages')
-                                        .add({
-                                      'content': _messageController.text.trim(),
-                                      'senderId': 'live_chat',
-                                      'timestamp': FieldValue.serverTimestamp(),
-                                    });
-                                    _messageController.clear();
-                                    // Log message sending
-                                    final userId = FirebaseAuth
-                                            .instance.currentUser?.uid ??
-                                        '';
-                                    _logMessageSending(userId);
-                                  },
+                                        .orderBy('timestamp', descending: true)
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return const Center(
+                                            child: LinearProgressIndicator());
+                                      }
+                                      final messages = snapshot.data!.docs;
+                                      return ListView.builder(
+                                        reverse: true,
+                                        itemCount: messages.length,
+                                        itemBuilder: (context, index) {
+                                          final message = messages[index];
+                                          return ChatBubble(
+                                            message: message['content'],
+                                            isSender: message['senderId'] ==
+                                                'live_chat',
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _messageController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Type a message...',
+                                          fillColor: Colors.white,
+                                          filled: true,
+                                          border: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                                color: Colors.grey),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    IconButton(
+                                      icon: const Icon(Icons.send),
+                                      onPressed: () async {
+                                        if (_messageController.text
+                                            .trim()
+                                            .isEmpty) {
+                                          return;
+                                        }
+                                        await FirebaseFirestore.instance
+                                            .collection('liveChats')
+                                            .doc(selectedChatId)
+                                            .collection('messages')
+                                            .add({
+                                          'content':
+                                              _messageController.text.trim(),
+                                          'senderId': 'live_chat',
+                                          'timestamp':
+                                              FieldValue.serverTimestamp(),
+                                        });
+                                        _messageController.clear();
+                                        // Log message sending
+                                        final userId = FirebaseAuth
+                                                .instance.currentUser?.uid ??
+                                            '';
+                                        _logMessageSending(userId);
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
