@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TotalSalesTile extends StatefulWidget {
   const TotalSalesTile({super.key});
@@ -39,18 +40,9 @@ class _TotalSalesTileState extends State<TotalSalesTile> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
+      child: SizedBox(
         width: 255,
         height: 120,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(begin: Alignment.topLeft, colors: [
-            Colors.deepPurple,
-            Colors.deepPurpleAccent,
-            Colors.deepPurple,
-            Colors.blueGrey
-          ]),
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Padding(
           padding: const EdgeInsets.only(left: 15),
           child: Column(
@@ -61,28 +53,28 @@ class _TotalSalesTileState extends State<TotalSalesTile> {
                 padding: EdgeInsets.only(top: 10.0, right: 10),
                 child: Icon(
                   Icons.money_sharp,
-                  size: 30,
-                  color: Colors.grey,
+                  size: 20,
+                  color: Colors.green,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 5.0, right: 10),
                 child: Text(
                   '₦$totalSales', // Display the total sales count
-                  style: const TextStyle(
+                  style: GoogleFonts.aboreto(
                       fontSize: 30,
-                      color: Colors.white,
+                      color: Colors.grey,
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.start,
                   softWrap: false,
                 ),
               ),
               const Spacer(),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12.0),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'Total Sales',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: GoogleFonts.abel(fontWeight: FontWeight.bold),
                 ),
               )
             ],
