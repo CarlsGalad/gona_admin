@@ -49,19 +49,19 @@ class OurUsersScreenState extends State<OurUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Center(
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
         child: Container(
           width: MediaQuery.of(context).size.width - 155,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10), color: Colors.blueGrey),
+              borderRadius: BorderRadius.circular(20), color: Colors.white),
           child: Scaffold(
-            backgroundColor: Colors.black54,
             appBar: AppBar(
               title: Text(
                 'Customers',
-                style: GoogleFonts.roboto(),
+                style: GoogleFonts.lato(color: Colors.white),
               ),
               centerTitle: true,
               actions: [
@@ -79,6 +79,7 @@ class OurUsersScreenState extends State<OurUsersScreen> {
                       icon: const Icon(Icons.insights)),
                 )
               ],
+              backgroundColor: Colors.grey[900],
             ),
             body: Row(
               children: [
@@ -120,8 +121,10 @@ class OurUsersScreenState extends State<OurUsersScreen> {
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.grey),
+            child: Card(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
               child: ListTile(
                 title: Text('$firstName $lastName',
                     style: GoogleFonts.aboreto(
