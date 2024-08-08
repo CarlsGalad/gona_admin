@@ -17,7 +17,10 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.grey[300],
+      decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(20), bottomRight: Radius.circular(20))),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
