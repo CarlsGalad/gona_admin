@@ -25,109 +25,117 @@ class NewsScreenState extends State<NewsScreen> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
-        color: Colors.black,
+        decoration: BoxDecoration(
+            color: Colors.grey[900], borderRadius: BorderRadius.circular(20)),
+
         width: MediaQuery.of(context).size.width -
             160, // Ensure the container takes the full available width
         child: Row(
           children: [
             Expanded(
               flex: 2,
-              child: StreamBuilder<QuerySnapshot>(
-                stream:
-                    FirebaseFirestore.instance.collection('news').snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: LinearProgressIndicator());
-                  }
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: StreamBuilder<QuerySnapshot>(
+                  stream:
+                      FirebaseFirestore.instance.collection('news').snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: LinearProgressIndicator());
+                    }
 
-                  final newsDocs = snapshot.data!.docs;
+                    final newsDocs = snapshot.data!.docs;
 
-                  return ListView.builder(
-                    itemCount: newsDocs.length,
-                    itemBuilder: (context, index) {
-                      final newsItem = NewsItem.fromMap(
-                          newsDocs[index].data() as Map<String, dynamic>);
+                    return ListView.builder(
+                      itemCount: newsDocs.length,
+                      itemBuilder: (context, index) {
+                        final newsItem = NewsItem.fromMap(
+                            newsDocs[index].data() as Map<String, dynamic>);
 
-                      final String imageUrl = newsItem.imageUrl;
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration:
-                              const BoxDecoration(color: Colors.blueGrey),
-                          child: ListTile(
-                            onTap: () {
-                              // When a news item is tapped, update the current screen to NewsDetailScreen
-                              setState(() {
-                                _currentScreen =
-                                    NewsDetailScreen(newsItem: newsItem);
-                              });
-                            },
-                            minTileHeight: 80,
-                            leading: SizedBox(
-                              height: 200,
-                              width: 100,
-                              child: ImageNetwork(
-                                image: imageUrl,
+                        final String imageUrl = newsItem.imageUrl;
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: ListTile(
+                              onTap: () {
+                                // When a news item is tapped, update the current screen to NewsDetailScreen
+                                setState(() {
+                                  _currentScreen =
+                                      NewsDetailScreen(newsItem: newsItem);
+                                });
+                              },
+                              minTileHeight: 80,
+                              leading: SizedBox(
                                 height: 200,
                                 width: 100,
-                                borderRadius: BorderRadius.circular(20),
+                                child: ImageNetwork(
+                                  image: imageUrl,
+                                  height: 200,
+                                  width: 100,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              title: Text(newsItem.title,
+                                  style: GoogleFonts.aboreto(fontSize: 18)),
+                              subtitle: Text(
+                                'By ${newsItem.author} • ${newsItem.timePosted}',
+                                style: GoogleFonts.abel(fontSize: 16),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, ),
+                                hoverColor: Colors.red,
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        backgroundColor: Colors.blueGrey,
+                                        title: const Text("Delete News"),
+                                        content: const Text(
+                                            "Are you sure you want to delete this news?"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text(
+                                              "Cancel",
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              // Delete the news item from Firestore
+                                              FirebaseFirestore.instance
+                                                  .collection('news')
+                                                  .doc(newsDocs[index].id)
+                                                  .delete();
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text(
+                                              "Delete",
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
                               ),
                             ),
-                            title: Text(newsItem.title,
-                                style: GoogleFonts.aboreto(fontSize: 18)),
-                            subtitle: Text(
-                              'By ${newsItem.author} • ${newsItem.timePosted}',
-                              style: GoogleFonts.abel(fontSize: 16),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      backgroundColor: Colors.blueGrey,
-                                      title: const Text("Delete News"),
-                                      content: const Text(
-                                          "Are you sure you want to delete this news?"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text(
-                                            "Cancel",
-                                            style:
-                                                TextStyle(color: Colors.black),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            // Delete the news item from Firestore
-                                            FirebaseFirestore.instance
-                                                .collection('news')
-                                                .doc(newsDocs[index].id)
-                                                .delete();
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text(
-                                            "Delete",
-                                            style:
-                                                TextStyle(color: Colors.black),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
             const VerticalDivider(
