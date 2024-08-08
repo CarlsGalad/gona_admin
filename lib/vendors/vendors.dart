@@ -18,6 +18,8 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
   int? _selectedVendorIndex;
   List<DocumentSnapshot> _vendors = [];
   List<DocumentSnapshot> _vendorItems = [];
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
 
   String? cUser = FirebaseAuth.instance.currentUser!.uid;
 
@@ -100,24 +102,27 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
         width: MediaQuery.of(context).size.width - 180,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10), color: Colors.blueGrey),
+            borderRadius: BorderRadius.circular(20), color: Colors.grey[900]),
         child: Row(
           children: [
             Expanded(
               flex: 2,
               child: _buildVendorsListView(),
             ),
-            const VerticalDivider(
-              thickness: 1,
-              width: 2,
-              color: Color.fromARGB(255, 26, 25, 25),
-            ),
+            const VerticalDivider(thickness: 1, width: 2, color: Colors.white),
             Expanded(
               flex: 3,
               child: _selectedVendorIndex == null
@@ -135,108 +140,116 @@ class OurVendorsScreenState extends State<OurVendorsScreen> {
   Widget _buildVendorsListView() {
     return Padding(
       padding: const EdgeInsets.all(12.0),
-      child: ListView.builder(
-        itemCount: _vendors.length,
-        itemBuilder: (context, index) {
-          final vendor = _vendors[index];
-          final farmName = vendor['farmName'] ?? 'Farm Name';
-          final ownersName = vendor['ownersName'] ?? 'Owner\'s Name';
-          final status = vendor['status'] ?? 'active';
+      child: KeyboardListener(
+        focusNode: _focusNode,
+        child: ListView.builder(
+          itemCount: _vendors.length,
+          itemBuilder: (context, index) {
+            final vendor = _vendors[index];
+            final farmName = vendor['farmName'] ?? 'Farm Name';
+            final ownersName = vendor['ownersName'] ?? 'Owner\'s Name';
+            final status = vendor['status'] ?? 'active';
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.grey),
-              child: ListTile(
-                title: Text(farmName,
-                    style: GoogleFonts.aboreto(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-                subtitle: Text(ownersName,
-                    style: GoogleFonts.abel(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-                onTap: () {
-                  setState(() {
-                    _selectedVendorIndex = index;
-                  });
-                  _fetchVendorItems(vendor['userId']);
-                },
-                trailing: SizedBox(
-                  width: 100,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          status == 'suspended' ? Icons.lock_open : Icons.block,
-                          color: status == 'suspended'
-                              ? Colors.green
-                              : Colors.orange,
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 4.0, vertical: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15)),
+                child: ListTile(
+                  title: Text(farmName,
+                      style: GoogleFonts.aboreto(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  subtitle: Text(ownersName,
+                      style: GoogleFonts.abel(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  onTap: () {
+                    setState(() {
+                      _selectedVendorIndex = index;
+                    });
+                    _fetchVendorItems(vendor['userId']);
+                  },
+                  trailing: SizedBox(
+                    width: 100,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            status == 'suspended'
+                                ? Icons.lock_open
+                                : Icons.block,
+                            color: status == 'suspended'
+                                ? Colors.green
+                                : Colors.orange,
+                          ),
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text(status == 'suspended'
+                                    ? 'Lift Suspension'
+                                    : 'Suspend Vendor'),
+                                content: Text(status == 'suspended'
+                                    ? 'Are you sure you want to lift the suspension on this vendor?'
+                                    : 'Are you sure you want to suspend this vendor?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: Text(status == 'suspended'
+                                        ? 'Lift Suspension'
+                                        : 'Suspend'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              _toggleVendorSuspension(index);
+                            }
+                          },
                         ),
-                        onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(status == 'suspended'
-                                  ? 'Lift Suspension'
-                                  : 'Suspend Vendor'),
-                              content: Text(status == 'suspended'
-                                  ? 'Are you sure you want to lift the suspension on this vendor?'
-                                  : 'Are you sure you want to suspend this vendor?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  child: Text(status == 'suspended'
-                                      ? 'Lift Suspension'
-                                      : 'Suspend'),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (confirm == true) {
-                            _toggleVendorSuspension(index);
-                          }
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Delete Vendor'),
-                              content: const Text(
-                                  'Are you sure you want to delete this vendor?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  child: const Text('Delete'),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (confirm == true) {
-                            _deleteVendor(index);
-                          }
-                        },
-                      ),
-                    ],
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Delete Vendor'),
+                                content: const Text(
+                                    'Are you sure you want to delete this vendor?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              _deleteVendor(index);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
