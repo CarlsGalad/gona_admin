@@ -64,45 +64,55 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: _screens[_selectedIndex],
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-              // sets the background color of the `BottomNavigationBar`
-              canvasColor: Colors.black,
-              // sets the active color of the `BottomNavigationBar` if `Brightness` is light
-              primaryColor: Colors.black,
-              textTheme: Theme.of(context).textTheme.copyWith()),
-          child: BottomNavigationBar(
-            unselectedItemColor: Colors.blueAccent,
-            showSelectedLabels: true,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
+      child: Container(
+        color: Colors.white,
+        child: Scaffold(
+          backgroundColor: Colors.grey[900],
+          body: _screens[_selectedIndex],
+          bottomNavigationBar: Theme(
+            data: Theme.of(context).copyWith(
+                // sets the background color of the `BottomNavigationBar`
+                canvasColor: Colors.white,
+                // sets the active color of the `BottomNavigationBar` if `Brightness` is light
+                primaryColor: Colors.white,
+                textTheme: Theme.of(context).textTheme.copyWith()),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20)),
+              child: BottomNavigationBar(
+                elevation: 2,
+                unselectedItemColor: Colors.grey,
+                showSelectedLabels: true,
+                showUnselectedLabels: true,
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.dashboard_outlined),
+                    label: 'Dashboard',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.hourglass_empty),
+                    label: 'Pending Orders',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.done_all),
+                    label: 'Processed Orders',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.flight_takeoff),
+                    label: 'Shipped Orders',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.handshake),
+                    label: 'Delivered Orders',
+                  ),
+                  // ... other items for sub-screens
+                ],
+                currentIndex: _selectedIndex,
+                selectedItemColor: Colors.orange.shade200,
+                onTap: _onItemTapped,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.access_time),
-                label: 'Pending Orders',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.done_all),
-                label: 'Processed Orders',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.local_shipping_outlined),
-                label: 'Shipped Orders',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.delivery_dining),
-                label: 'Delivered Orders',
-              ),
-              // ... other items for sub-screens
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.blue,
-            onTap: _onItemTapped,
+            ),
           ),
         ),
       ),
