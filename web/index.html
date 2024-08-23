@@ -2,40 +2,86 @@
 <html>
 
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="gona_admin">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
-
   <title>gona_admin</title>
   <link rel="manifest" href="manifest.json">
+  <script src="flutter.js" defer></script>
 </head>
 
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- Initialize Firebase -->
+  <script type="module">
+    // Import the Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-storage.js";
+    import { getMessaging } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-messaging.js";
+
+      // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDZcgHIQ9UQ2I78WwMehU6PP5zGJiQ7MQ0",
+          authDomain: "gona-d5e94.firebaseapp.com",
+          databaseURL: "https://gona-d5e94-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "gona-d5e94",
+          storageBucket: "gona-d5e94.appspot.com",
+          messagingSenderId: "649622728671",
+          appId: "1:649622728671:web:ce42bacc96224edddede6a",
+          measurementId: "G-SX1EPN0RVC"
+        };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    // Initialize Firebase services
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const messaging = getMessaging(app);
+
+    // Make Firebase services available globally if needed
+    window.auth = auth;
+    window.db = db;
+    window.storage = storage;
+    window.messaging = messaging;
+  </script>
+
+  <!-- Custom Bootstrap Script -->
+  <script>
+    window.addEventListener('load', function () {
+      // Create and display a loading indicator
+      const loading = document.createElement('div');
+      loading.textContent = "Loading Entrypoint...";
+      document.body.appendChild(loading);
+
+      // Initialize Flutter app with service worker settings
+      _flutter.loader.load({
+        serviceWorkerSettings: {
+          serviceWorkerVersion: "{{flutter_service_worker_version}}",
+        },
+        onEntrypointLoaded: async function (engineInitializer) {
+          // Update loading message and initialize engine
+          loading.textContent = "Initializing engine...";
+          const appRunner = await engineInitializer.initializeEngine();
+
+          // Update loading message and run the app
+          loading.textContent = "Running app...";
+          await appRunner.runApp();
+
+          // Remove loading indicator once app is running
+          document.body.removeChild(loading);
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>
