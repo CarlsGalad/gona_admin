@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ShippedOdersCount extends StatefulWidget {
-  const ShippedOdersCount({super.key});
+class ShippedOrdersCount extends StatefulWidget {
+  const ShippedOrdersCount({super.key});
 
   @override
-  State<ShippedOdersCount> createState() => _ShippedOdersCountState();
+  State<ShippedOrdersCount> createState() => _ShippedOrdersCountState();
 }
 
-class _ShippedOdersCountState extends State<ShippedOdersCount> {
+class _ShippedOrdersCountState extends State<ShippedOrdersCount> {
   int _shippedOrdersCount = 0;
 
   @override
