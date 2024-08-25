@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'sign_up_page.dart';
 
-
 class SigninOrRegisterPage extends StatefulWidget {
   const SigninOrRegisterPage({super.key});
 
@@ -31,7 +30,7 @@ class _SigninOrRegisterPageState extends State<SigninOrRegisterPage> {
       );
     } else {
       // else go to sign up screen
-      return SingUpPage(
+      return SignUpPage(
         onTap: togglePages,
       );
     }
