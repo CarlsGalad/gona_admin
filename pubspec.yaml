@@ -57,6 +57,7 @@ dependencies:
   # flutterwave_standard: ^1.0.8
   http: ^1.2.1
   flutter_email_sender: ^6.0.3
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
