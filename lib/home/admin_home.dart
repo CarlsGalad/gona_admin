@@ -12,6 +12,7 @@ import 'package:gona_admin/payment_managment.dart';
 import 'package:gona_admin/transcactions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_network/image_network.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../categories/category.dart';
 import '../disputes/disputes.dart';
@@ -88,7 +89,9 @@ class _AdminHomeState extends State<AdminHome> {
       try {
         List<Map<String, dynamic>> results =
             await _searchService.search(searchText);
-        Navigator.pop(context); // Remove the loading indicator
+        if (mounted) {
+          Navigator.pop(context);
+        } // Remove the loading indicator
 
         // Log the search activity
         if (adminId != null) {
@@ -97,25 +100,32 @@ class _AdminHomeState extends State<AdminHome> {
         }
 
         if (results.isEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SearchResultsScreen(
-                  searchResults: results, errorMessage: 'No results found.'),
-            ),
-          );
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SearchResultsScreen(
+                    searchResults: results, errorMessage: 'No results found.'),
+              ),
+            );
+          }
         } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SearchResultsScreen(searchResults: results),
-            ),
-          );
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    SearchResultsScreen(searchResults: results),
+              ),
+            );
+          }
         }
       } catch (e) {
-        Navigator.pop(context); // Remove the loading indicator
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('An error occurred during the search.')));
+        if (mounted) {
+          Navigator.pop(context); // Remove the loading indicator
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('An error occurred during the search.')));
+        }
 
         // Log the search error
         if (adminId != null) {
@@ -148,11 +158,12 @@ class _AdminHomeState extends State<AdminHome> {
           // Get the image URL and update the admin data
           String imageUrl = await snapshot.ref.getDownloadURL();
           await AdminService().updateAdminImage(adminId!, imageUrl);
-
-          // Show a snackbar or toast message to indicate success
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Profile image updated successfully'),
-          ));
+          if (mounted) {
+            // Show a snackbar or toast message to indicate success
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Profile image updated successfully'),
+            ));
+          }
 
           // Log the image upload activity
           if (adminId != null) {
@@ -160,8 +171,10 @@ class _AdminHomeState extends State<AdminHome> {
                 adminId!, 'Profile Image Upload', 'Uploaded new profile image');
           }
         } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Failed to upload image.')));
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to upload image.')));
+          }
 
           // Log the image upload error
           if (adminId != null) {
@@ -240,8 +253,6 @@ class _AdminHomeState extends State<AdminHome> {
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
-
-      // editting here
       body: Row(
         children: [
           CustomNavigationRail(
@@ -316,7 +327,7 @@ class _AdminHomeState extends State<AdminHome> {
                       padding: const EdgeInsets.all(15.0),
                       child: Row(
                         children: [
-                          //title dasboard
+                          //title dashboard
                           Padding(
                             padding: const EdgeInsets.all(14.0),
                             child: Row(
@@ -378,7 +389,7 @@ class _AdminHomeState extends State<AdminHome> {
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0, left: 8),
                             child: IconButton(
-                                tooltip: 'Payment Manangement',
+                                tooltip: 'Payment Management',
                                 color: Colors.grey.shade900,
                                 onPressed: () {
                                   if (department == 'Admin' ||
@@ -393,7 +404,7 @@ class _AdminHomeState extends State<AdminHome> {
                                 icon: const Icon(Icons.wallet)),
                           ),
 
-                          //transcation history
+                          //transaction history
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0, left: 8),
                             child: IconButton(
@@ -421,6 +432,7 @@ class _AdminHomeState extends State<AdminHome> {
                               return Stack(
                                 children: [
                                   PopupMenuButton(
+                                    color: Colors.white,
                                     iconColor: Colors.grey.shade900,
                                     icon: const Icon(Icons.notifications),
                                     itemBuilder: (BuildContext context) {
@@ -510,11 +522,15 @@ class _AdminHomeState extends State<AdminHome> {
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   isLoading
-                                      ? const CircularProgressIndicator()
+                                      ? Shimmer.fromColors(
+                                          baseColor: Colors.orange.shade200,
+                                          highlightColor: Colors.grey.shade100,
+                                          child: const Icon(Icons.person),
+                                        )
                                       : Padding(
                                           padding: const EdgeInsets.only(
                                               right: 20.0),
@@ -538,10 +554,18 @@ class _AdminHomeState extends State<AdminHome> {
                                                           'imagePath'],
                                                       width: 25,
                                                       height: 25,
+                                                      onLoading:
+                                                          Shimmer.fromColors(
+                                                        baseColor: Colors
+                                                            .orange.shade200,
+                                                        highlightColor: Colors
+                                                            .grey.shade100,
+                                                        child: const Icon(
+                                                            Icons.person),
+                                                      ),
                                                     ),
                                                   )
-                                                : const Icon(
-                                                    Icons.account_box_rounded),
+                                                : const Icon(Icons.person),
                                             iconColor: Colors.white54,
                                             color: Colors.white70,
                                             position: PopupMenuPosition.under,
@@ -744,6 +768,9 @@ class _AdminHomeState extends State<AdminHome> {
       await AdminService().logActivity(adminId!, 'Logout', 'Admin logged out');
     }
     FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.pop(context);
+    }
     // Navigate to login screen or any other action after logout
   }
 }
