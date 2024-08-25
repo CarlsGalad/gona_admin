@@ -32,7 +32,7 @@ class CustomNavigationRail extends StatelessWidget {
                   height: 100,
                   width: 150,
                   child: Image.asset(
-                    'lib/images/file.png',
+                    'lib/images/gona_night.png',
                     width: 100,
                     fit: BoxFit.cover,
                   ),
