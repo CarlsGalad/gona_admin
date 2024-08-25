@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 
 class TopItems extends StatefulWidget {
   const TopItems({super.key});
@@ -53,10 +54,10 @@ class _TopItemsState extends State<TopItems> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: SizedBox(
           child: Padding(
-            padding: EdgeInsets.all(15.0),
+            padding: const EdgeInsets.all(15.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -77,7 +78,32 @@ class _TopItemsState extends State<TopItems> {
                     future: _fetchTopItems(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                        return ListView.builder(
+                          itemCount: 8, // Example placeholder count
+                          itemBuilder: (context, index) {
+                            return Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: ListTile(
+                                title: Container(
+                                  width: double.infinity,
+                                  height: 14.0,
+                                  color: Colors.white,
+                                ),
+                                subtitle: Container(
+                                  width: double.infinity,
+                                  height: 10.0,
+                                  color: Colors.white,
+                                ),
+                                trailing: Container(
+                                  width: 60.0,
+                                  height: 10.0,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       }
                       if (snapshot.data!.isEmpty) {
                         return Center(
