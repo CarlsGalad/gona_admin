@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 class DailyChart extends StatefulWidget {
   const DailyChart({super.key});
@@ -115,7 +116,50 @@ class _DailyChartState extends State<DailyChart> {
               padding: const EdgeInsets.only(
                   top: 20.0, right: 10, bottom: 10, left: 10),
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 300,
+                            color: Colors.white,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Shimmer for bars
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(7, (index) {
+                                    return Container(
+                                      width: 25,
+                                      height: 100 + (index * 10).toDouble(),
+                                      color: Colors.white,
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(height: 20),
+                                // Shimmer for bottom titles
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(7, (index) {
+                                    return Container(
+                                      width: 40,
+                                      height: 20,
+                                      color: Colors.white,
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   : BarChart(
                       BarChartData(
                         titlesData: FlTitlesData(
@@ -148,7 +192,8 @@ class _DailyChartState extends State<DailyChart> {
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
                                     daysOfWeek[value.toInt()],
-                                    style: GoogleFonts.abel(color: Colors.grey[900]),
+                                    style: GoogleFonts.abel(
+                                        color: Colors.grey[900]),
                                   ),
                                 );
                               },
