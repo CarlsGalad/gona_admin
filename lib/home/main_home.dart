@@ -35,10 +35,12 @@ class _MainHomeState extends State<MainHome> {
       await AdminService()
           .logActivity(adminId!, 'Navigation', 'Navigated to $tileName');
     }
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => navigateTo()),
-    );
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => navigateTo()),
+      );
+    }
   }
 
   @override
@@ -86,7 +88,7 @@ class _MainHomeState extends State<MainHome> {
                                 GestureDetector(
                                   onTap: () => _logTileTap('Shipped Orders',
                                       () => const ShippedOrderScreen()),
-                                  child: const ShippedOdersCount(),
+                                  child: const ShippedOrdersCount(),
                                 ),
                                 GestureDetector(
                                   onTap: () => _logTileTap('Delivered Orders',
@@ -112,7 +114,7 @@ class _MainHomeState extends State<MainHome> {
                           ],
                         ),
                         // Top Items
-                        TopItems(),
+                        const TopItems(),
                       ],
                     ),
                   ],
