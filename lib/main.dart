@@ -5,13 +5,13 @@ import 'package:gona_admin/firebase_options.dart';
 import 'package:gona_admin/watcher.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+ 
 
   // Initialize Firebase with specified options
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.web,
   );
-  
+   WidgetsFlutterBinding.ensureInitialized();
   // Start the app after initializing services
   runApp(const GonaAdmin());
 }
@@ -43,8 +43,13 @@ class GonaAdmin extends StatelessWidget {
 
   // Function to initialize services asynchronously
   Future<void> _initializeServices() async {
-    // Create an instance of the OrderWatcherService and start watching
-    OrderWatcherService orderWatcherService = OrderWatcherService();
-    orderWatcherService.startWatching();
+    try {
+      OrderWatcherService orderWatcherService = OrderWatcherService();
+      await orderWatcherService.startWatching();
+        print('Order watcher service started successfully');
+    } catch (e) {
+      print('Error initializing services: $e');
+      // Handle the error appropriately
+    }
   }
 }
