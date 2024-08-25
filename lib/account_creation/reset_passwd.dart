@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ResetPassWPage extends StatefulWidget {
   const ResetPassWPage({super.key});
@@ -33,7 +35,6 @@ class _ResetPassWPageState extends State<ResetPassWPage> {
             );
           });
     } on FirebaseException catch (e) {
-      print(e);
       showDialog(
           context: context,
           builder: (context) {
@@ -54,7 +55,7 @@ class _ResetPassWPageState extends State<ResetPassWPage> {
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 25.0),
           child: Text(
-            'Enter your Email to recieve password reset link',
+            'Enter your Email to receive password reset link',
             textAlign: TextAlign.center,
           ),
         ),
@@ -84,9 +85,17 @@ class _ResetPassWPageState extends State<ResetPassWPage> {
         ),
         // reset button
         MaterialButton(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onPressed: () {},
-          color: const Color.fromARGB(255, 49, 105, 11),
-          child: const Text('Reset Password'),
+          color: Colors.green.shade100,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Reset Password',
+              style: GoogleFonts.abel(fontWeight: FontWeight.bold),
+            ),
+          ),
         )
       ],
     ));
