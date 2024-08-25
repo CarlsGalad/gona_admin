@@ -42,7 +42,7 @@ class _NewUsersCountTileState extends State<NewUsersCountTile> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
+      child: SizedBox(
         width: 255,
         height: 120,
         child: Padding(
@@ -62,7 +62,7 @@ class _NewUsersCountTileState extends State<NewUsersCountTile> {
               Padding(
                 padding: const EdgeInsets.only(top: 5.0, right: 10),
                 child: Text(
-                  '$_newUserCount', // Display the num of new users inthe last one week
+                  '$_newUserCount', // Display the num of new users in the last one week
                   style: GoogleFonts.aboreto(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -73,7 +73,7 @@ class _NewUsersCountTileState extends State<NewUsersCountTile> {
               ),
               const Spacer(),
               Padding(
-                padding: EdgeInsets.only(bottom: 12.0),
+                padding: const EdgeInsets.only(bottom: 12.0),
                 child: Text(
                   'New Users',
                   style: GoogleFonts.abel(fontWeight: FontWeight.bold),
