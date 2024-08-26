@@ -157,150 +157,243 @@ class MarketingScreenState extends State<MarketingScreen> {
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DropdownButton<String>(
-                        style: GoogleFonts.abel(color: Colors.black),
-                        value: selectedTopic,
-                        hint: Text(
-                          'Select Topic',
-                          style: GoogleFonts.abel(fontSize: 14),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedTopic = value;
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ToggleButtons(
+                          isSelected: [
+                            selectedTopic == 'new_products',
+                            selectedTopic == 'promotions',
+                            selectedTopic == 'order_updates',
+                          ],
+                          onPressed: (index) {
+                            setState(() {
+                              switch (index) {
+                                case 0:
+                                  selectedTopic = 'new_products';
+                                  break;
+                                case 1:
+                                  selectedTopic = 'promotions';
+                                  break;
+                                case 2:
+                                  selectedTopic = 'order_updates';
+                                  break;
+                              }
 
-                            // Log activity for selecting a topic
-                            if (adminId != null && value != null) {
-                              AdminService().logActivity(adminId!,
-                                  'Select Topic', 'Selected topic "$value"');
-                            }
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(10),
-                        dropdownColor: Colors.black.withOpacity(0.5),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'new_products',
-                            child: Text('New Products',
-                                style: GoogleFonts.abel(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                          DropdownMenuItem(
-                            value: 'promotions',
-                            child: Text(
-                              'Promotions',
-                              style: GoogleFonts.abel(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                              // Log activity for selecting a topic
+                              if (adminId != null && selectedTopic != null) {
+                                AdminService().logActivity(
+                                    adminId!,
+                                    'Select Topic',
+                                    'Selected topic "$selectedTopic"');
+                              }
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(10),
+                          fillColor: Colors.black.withOpacity(0.5),
+                          selectedColor: Colors.white,
+                          color: Colors.black,
+                          textStyle:
+                              GoogleFonts.abel(fontWeight: FontWeight.bold),
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text('New Products'),
                             ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'order_updates',
-                            child: Text('Order Updates',
-                                style: GoogleFonts.abel(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                        ],
-                      ),
-                      DropdownButton<String>(
-                        style: GoogleFonts.abel(),
-                        value: selectedUserGroup,
-                        dropdownColor: Colors.black.withOpacity(0.5),
-                        hint: Text(
-                          'Select User Group',
-                          style: GoogleFonts.abel(fontSize: 16),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text('Promotions'),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text('Order Updates'),
+                            ),
+                          ],
                         ),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedUserGroup = value;
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RadioListTile<String>(
+                                title: Text('Vendors',
+                                    style: GoogleFonts.abel(
+                                        fontWeight: FontWeight.bold)),
+                                value: 'vendors',
+                                groupValue: selectedUserGroup,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedUserGroup = value;
 
-                            // Log activity for selecting a user group
-                            if (adminId != null && value != null) {
-                              AdminService().logActivity(
-                                  adminId!,
-                                  'Select User Group',
-                                  'Selected user group "$value"');
-                            }
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(10),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'vendors',
-                            child: Text('Vendors',
-                                style: GoogleFonts.abel(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                          DropdownMenuItem(
-                            value: 'customers',
-                            child: Text('Customers',
-                                style: GoogleFonts.abel(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                        ],
-                      ),
-                      TextField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                            labelText: 'Title',
-                            labelStyle: GoogleFonts.abel(fontSize: 14)),
-                      ),
-                      TextField(
-                        controller: _messageController,
-                        decoration: InputDecoration(
-                            labelText: 'Message',
-                            labelStyle: GoogleFonts.abel(fontSize: 14)),
-                      ),
-                      TextField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                            labelText: 'Email (Optional)',
-                            labelStyle: GoogleFonts.abel(fontSize: 14)),
-                      ),
-                      TextField(
-                        controller: _imageUrlsController,
-                        decoration: InputDecoration(
-                            labelText: 'Image URLs (Comma separated)',
-                            labelStyle: GoogleFonts.abel(fontSize: 14)),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _keyController,
-                              decoration: InputDecoration(
-                                  labelText: 'Data Key',
-                                  labelStyle: GoogleFonts.abel()),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              style: const TextStyle(
-                                color: Colors.black,
+                                    // Log activity for selecting a user group
+                                    if (adminId != null && value != null) {
+                                      AdminService().logActivity(
+                                          adminId!,
+                                          'Select User Group',
+                                          'Selected user group "$value"');
+                                    }
+                                  });
+                                },
+                                activeColor: Colors.orange.shade200,
                               ),
-                              controller: _valueController,
+                            ),
+                            Expanded(
+                              child: RadioListTile<String>(
+                                title: Text('Customers',
+                                    style: GoogleFonts.abel(
+                                        fontWeight: FontWeight.bold)),
+                                value: 'customers',
+                                groupValue: selectedUserGroup,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedUserGroup = value;
+
+                                    // Log activity for selecting a user group
+                                    if (adminId != null && value != null) {
+                                      AdminService().logActivity(
+                                          adminId!,
+                                          'Select User Group',
+                                          'Selected user group "$value"');
+                                    }
+                                  });
+                                },
+                                activeColor: Colors.orange.shade200,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Card(
+                          elevation: 3,
+                          color: Colors.grey[100],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextField(
+                              controller: _titleController,
                               decoration: InputDecoration(
-                                  labelText: 'Data Value',
-                                  labelStyle: GoogleFonts.abel()),
+                                  labelText: 'Title',
+                                  border: InputBorder.none,
+                                  labelStyle: GoogleFonts.abel(fontSize: 14)),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: _addDataField,
-                            color: Colors.black,
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Card(
+                          elevation: 3,
+                          color: Colors.grey[100],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextField(
+                              controller: _messageController,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: 'Message',
+                                  labelStyle: GoogleFonts.abel(fontSize: 14)),
+                            ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Expanded(
-                        child: ListView.builder(
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Card(
+                          elevation: 3,
+                          color: Colors.grey[100],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: 'Email (Optional)',
+                                  labelStyle: GoogleFonts.abel(fontSize: 14)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Card(
+                          elevation: 3,
+                          color: Colors.grey[100],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextField(
+                              controller: _imageUrlsController,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: 'Image URLs (Comma separated)',
+                                  labelStyle: GoogleFonts.abel(fontSize: 14)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Card(
+                                elevation: 3,
+                                color: Colors.grey[100],
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3)),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0),
+                                  child: TextField(
+                                    controller: _keyController,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        labelText: 'Data Key',
+                                        labelStyle: GoogleFonts.abel()),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Card(
+                                elevation: 3,
+                                color: Colors.grey[100],
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3)),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0),
+                                  child: TextField(
+                                    style: const TextStyle(color: Colors.black),
+                                    controller: _valueController,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        labelText: 'Data Value',
+                                        labelStyle: GoogleFonts.abel()),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: _addDataField,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: _dataFields.length,
                           itemBuilder: (context, index) {
                             final key = _dataFields.keys.elementAt(index);
@@ -311,43 +404,43 @@ class MarketingScreenState extends State<MarketingScreen> {
                             );
                           },
                         ),
-                      ),
-                      Row(
-                        children: [
-                          MaterialButton(
-                            color: Colors.orange.shade200,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)),
-                            onPressed: () {
-                              sendNotification(
-                                _titleController.text,
-                                _messageController.text,
-                                _dataFields,
-                              );
-
-                              if (_emailController.text.isNotEmpty) {
-                                sendEmailWithImages(
-                                  _emailController.text,
+                        Row(
+                          children: [
+                            MaterialButton(
+                              color: Colors.orange.shade200,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5)),
+                              onPressed: () {
+                                sendNotification(
                                   _titleController.text,
                                   _messageController.text,
-                                  _imageUrlsController.text.split(','),
+                                  _dataFields,
                                 );
-                              }
 
-                              _clearFields();
-                            },
-                            child: Text('Send Notification',
-                                style: GoogleFonts.abel(
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                          const SizedBox(width: 20),
-                          MaterialButton(
-                            onPressed: _clearFields,
-                            child: Text('Clear', style: GoogleFonts.abel()),
-                          ),
-                        ],
-                      ),
-                    ],
+                                if (_emailController.text.isNotEmpty) {
+                                  sendEmailWithImages(
+                                    _emailController.text,
+                                    _titleController.text,
+                                    _messageController.text,
+                                    _imageUrlsController.text.split(','),
+                                  );
+                                }
+
+                                _clearFields();
+                              },
+                              child: Text('Send Notification',
+                                  style: GoogleFonts.abel(
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            const SizedBox(width: 20),
+                            MaterialButton(
+                              onPressed: _clearFields,
+                              child: Text('Clear', style: GoogleFonts.abel()),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
