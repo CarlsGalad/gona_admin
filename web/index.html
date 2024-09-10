@@ -1,23 +1,66 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+ 
   <base href="$FLUTTER_BASE_HREF">
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="gona_admin">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
   <title>gona_admin</title>
   <link rel="manifest" href="manifest.json">
-  <script src="flutter.js" defer></script>
-</head>
 
+    <style>
+      #loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+      }
+    
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #9afd9f;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+    
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+</head>
 <body>
-  <!-- Initialize Firebase -->
+
+  <div id="loading">
+    <div class="spinner"></div>
+  </div>
+
+
   <script type="module">
     // Import the Firebase SDKs
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
@@ -26,17 +69,17 @@
     import { getStorage } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-storage.js";
     import { getMessaging } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-messaging.js";
 
-      // Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyDZcgHIQ9UQ2I78WwMehU6PP5zGJiQ7MQ0",
-          authDomain: "gona-d5e94.firebaseapp.com",
-          databaseURL: "https://gona-d5e94-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "gona-d5e94",
-          storageBucket: "gona-d5e94.appspot.com",
-          messagingSenderId: "649622728671",
-          appId: "1:649622728671:web:ce42bacc96224edddede6a",
-          measurementId: "G-SX1EPN0RVC"
-        };
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZcgHIQ9UQ2I78WwMehU6PP5zGJiQ7MQ0",
+      authDomain: "gona-d5e94.firebaseapp.com",
+      databaseURL: "https://gona-d5e94-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "gona-d5e94",
+      storageBucket: "gona-d5e94.appspot.com",
+      messagingSenderId: "649622728671",
+      appId: "1:649622728671:web:ce42bacc96224edddede6a",
+      measurementId: "G-SX1EPN0RVC"
+    };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
@@ -53,35 +96,12 @@
     window.storage = storage;
     window.messaging = messaging;
   </script>
+  <script src="flutter_bootstrap.js" async></script>
 
-  <!-- Custom Bootstrap Script -->
   <script>
     window.addEventListener('load', function () {
-      // Create and display a loading indicator
-      const loading = document.createElement('div');
-      loading.textContent = "Loading Entrypoint...";
-      document.body.appendChild(loading);
-
-      // Initialize Flutter app with service worker settings
-      _flutter.loader.load({
-        serviceWorkerSettings: {
-          serviceWorkerVersion: "{{flutter_service_worker_version}}",
-        },
-        onEntrypointLoaded: async function (engineInitializer) {
-          // Update loading message and initialize engine
-          loading.textContent = "Initializing engine...";
-          const appRunner = await engineInitializer.initializeEngine();
-
-          // Update loading message and run the app
-          loading.textContent = "Running app...";
-          await appRunner.runApp();
-
-          // Remove loading indicator once app is running
-          document.body.removeChild(loading);
-        }
-      });
+      document.getElementById('loading').style.display = 'none';
     });
   </script>
 </body>
-
 </html>
